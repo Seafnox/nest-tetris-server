@@ -43,23 +43,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('typing')
-  typing(client: XSocketClient, payload: any): void {
-    console.log('typing', client.id, client.name, JSON.stringify(payload));
+  typing(client: XSocketClient): void {
+    console.log('typing', client.id, client.name);
     this.server.emit('typing', {
       id: client.id,
       username: client.name,
-      message: payload.toString(),
-      typing: true,
     });
   }
 
   @SubscribeMessage('stop typing')
-  stopTyping(client: XSocketClient, payload: any): void {
-    console.log('stop typing', client.id, client.name, JSON.stringify(payload));
+  stopTyping(client: XSocketClient): void {
+    console.log('stop typing', client.id, client.name);
     this.server.emit('stop typing', {
       id: client.id,
       username: client.name,
-      data: payload.toString(),
     });
   }
 
