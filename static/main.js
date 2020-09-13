@@ -229,7 +229,7 @@ $(function() {
     socket.on('login', (data) => {
         connected = true;
         // Display the welcome message
-        var message = "Welcome to Socket.IO Chat – ";
+        var message = "Welcome to Socket.IO Chat";
         log(message, {
             prepend: true
         });
@@ -238,13 +238,19 @@ $(function() {
 
     // Whenever the server emits 'new message', update the chat body
     socket.on('new message', (data) => {
-        addChatMessage(data);
+        log(`new message to '${username}': '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        if (data.username !== username){
+            addChatMessage(data);
+        }
     });
 
     // Whenever the server emits 'user joined', log it in the chat body
     socket.on('user joined', (data) => {
-        log(data.username + ' joined');
-        addParticipantsMessage(data);
+        log(`user joined to '${username}': '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        if (data.username !== username){
+            log(data.username + ' joined');
+            addParticipantsMessage(data);
+        }
     });
 
     // Whenever the server emits 'user left', log it in the chat body
@@ -256,12 +262,18 @@ $(function() {
 
     // Whenever the server emits 'typing', show the typing message
     socket.on('typing', (data) => {
-        addChatTyping(data);
+        log(`typing to '${username}': '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        if (data.username !== username){
+            addChatTyping(data);
+        }
     });
 
     // Whenever the server emits 'stop typing', kill the typing message
     socket.on('stop typing', (data) => {
-        removeChatTyping(data);
+        log(`stop typing to '${username}': '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        if (data.username !== username){
+            removeChatTyping(data);
+        }
     });
 
     socket.on('disconnect', () => {
