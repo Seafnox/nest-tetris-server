@@ -21,7 +21,7 @@ $(function() {
     var connected = false;
     var typing = false;
     var lastTypingTime;
-    var $currentInput = $usernameInput.focus();
+    $usernameInput.val(`test-${Math.floor(Math.random()*1000)}`);
 
     var socket = io();
 
@@ -44,7 +44,7 @@ $(function() {
             $loginPage.fadeOut();
             $chatPage.show();
             $loginPage.off('click');
-            $currentInput = $inputMessage.focus();
+            $inputMessage.focus();
 
             // Tell the server your username
             socket.emit('add user', username);
@@ -192,8 +192,8 @@ $(function() {
 
     $window.keydown(event => {
         // Auto-focus the current input when a key is typed
-        if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-            $currentInput.focus();
+        if (username && !(event.ctrlKey || event.metaKey || event.altKey)) {
+            $inputMessage.focus();
         }
         // When the client hits ENTER on their keyboard
         if (event.which === 13) {
@@ -215,7 +215,7 @@ $(function() {
 
     // Focus input when clicking anywhere on login page
     $loginPage.click(() => {
-        $currentInput.focus();
+        $usernameInput.focus()
     });
 
     // Focus input when clicking on the message input's border
@@ -291,4 +291,5 @@ $(function() {
         log('attempt to reconnect has failed');
     });
 
+    setUsername();
 });
