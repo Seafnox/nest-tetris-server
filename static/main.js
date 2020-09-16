@@ -14,7 +14,10 @@ $(function() {
     var $inputMessage = $('.inputMessage'); // Input message input box
 
     var $loginPage = $('.login.page'); // The login page
-    var $chatPage = $('.chat.page'); // The chatroom page
+    var $chatPage = $('.game.page'); // The chatroom page
+    var $gameField = $('.gameField');
+    var $gameNextItem = $('.gameNextItem');
+    var $gameScore = $('.gameScore');
 
     // Prompt for setting a username
     var username;
@@ -70,7 +73,7 @@ $(function() {
 
     // Log a message
     const log = (message, options) => {
-        var $el = $('<li>').addClass('log').text(message);
+        var $el = $('<div>').addClass('message log').text(message);
         addMessageElement($el, options);
     }
 
@@ -91,7 +94,7 @@ $(function() {
             .text(data.message);
 
         var typingClass = data.typing ? 'typing' : '';
-        var $messageDiv = $('<li class="message"/>')
+        var $messageDiv = $('<div class="message"/>')
             .data('username', data.username)
             .addClass(typingClass)
             .append($usernameDiv, $messageBodyDiv);
@@ -188,6 +191,30 @@ $(function() {
         return COLORS[index];
     }
 
+    const updateGameState = (state) => {
+        $gameField.innerHTML = state.map(row => ([
+            '<div>',
+            row
+                .map(cell => (`<div class="gameCell ${cell === '.' ? '' : 'empty'}"></div>`))
+                .join(''),
+            '</div>',
+        ].join(''))).join('');
+    }
+
+    const updateNextItem = (item) => {
+        $gameNextItem.innerHTML = item.map(row => ([
+            '<div>',
+            row
+                .map(cell => (`<div class="gameCell ${cell === '.' ? '' : 'empty'}"></div>`))
+                .join(''),
+            '</div>',
+        ].join(''))).join('');
+    }
+
+    const updateScore = (value) => {
+        $gameScore.innerText = value;
+    }
+
     // Keyboard events
 
     $window.keydown(event => {
@@ -230,23 +257,37 @@ $(function() {
         connected = true;
         // Display the welcome message
         var message = "Welcome to Socket.IO Chat";
-        log(message, {
-            prepend: true
-        });
+        log(message, {prepend: true});
         addParticipantsMessage(data);
+        socket.emit('startGame');
     });
 
     // Whenever the server emits 'new message', update the chat body
     socket.on('new message', (data) => {
-        log(`new message to '${username}': '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        log(`new message: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
         if (data.username !== username){
             addChatMessage(data);
         }
     });
 
+    socket.on('newGameState', data => {
+        log(`newGameState: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        updateGameState(data.state);
+    })
+
+    socket.on('newNextItem', data => {
+        log(`newNextItem: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        updateNextItem(data.item);
+    })
+
+    socket.on('newScore', data => {
+        log(`newNextItem: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        updateScore(data.value);
+    })
+
     // Whenever the server emits 'user joined', log it in the chat body
     socket.on('user joined', (data) => {
-        log(`user joined to '${username}': '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        log(`user joined: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
         if (data.username !== username){
             log(data.username + ' joined');
             addParticipantsMessage(data);
@@ -262,7 +303,7 @@ $(function() {
 
     // Whenever the server emits 'typing', show the typing message
     socket.on('typing', (data) => {
-        log(`typing to '${username}': '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        log(`typing: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
         if (data.username !== username){
             addChatTyping(data);
         }
@@ -270,7 +311,7 @@ $(function() {
 
     // Whenever the server emits 'stop typing', kill the typing message
     socket.on('stop typing', (data) => {
-        log(`stop typing to '${username}': '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        log(`stop typing: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
         if (data.username !== username){
             removeChatTyping(data);
         }

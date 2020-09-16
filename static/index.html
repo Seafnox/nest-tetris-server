@@ -7,11 +7,41 @@
 </head>
 <body>
 <ul class="pages">
-    <li class="chat page">
-        <div class="chatArea">
-            <ul class="messages"></ul>
+    <li class="game page">
+        <div class="gamePageContainer">
+            <div class="gameSide">
+                <div class="gameHeader">
+                    <div class="gameScore">0</div>
+                    <div class="gameNextItem">
+                        <div>
+                            <div class="gameCell empty"></div>
+                            <div class="gameCell empty"></div>
+                            <div class="gameCell empty"></div>
+                            <div class="gameCell empty"></div>
+                        </div>
+                        <div>
+                            <div class="gameCell"></div>
+                            <div class="gameCell"></div>
+                            <div class="gameCell"></div>
+                            <div class="gameCell"></div>
+                        </div>
+                        <div>
+                            <div class="gameCell empty"></div>
+                            <div class="gameCell empty"></div>
+                            <div class="gameCell empty"></div>
+                            <div class="gameCell empty"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gameField"></div>
+            </div>
+            <div class="chatSide">
+                <div class="chatArea">
+                    <div class="messages"></div>
+                </div>
+                <input class="inputMessage" placeholder="Type here..."/>
+            </div>
         </div>
-        <input class="inputMessage" placeholder="Type here..."/>
     </li>
     <li class="login page">
         <div class="form">
