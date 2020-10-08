@@ -19,12 +19,12 @@ export class Square extends Figure {
         }));
     }
 
-    public isLastAvailableX(state: GameState): boolean {
+    public hasClearFloor(state: GameState): boolean {
         const firstY = this.posY - 1;
         const secondY = this.posY;
         const nextX = this.posX - 1;
 
-        return state[nextX][firstY] === CellState.EMPTY && state[nextX][secondY] === CellState.EMPTY;
+        return nextX >= 0 && state[nextX][firstY] === CellState.EMPTY && state[nextX][secondY] === CellState.EMPTY;
     }
 
     public isLeftMoveAvailable(state: GameState): boolean {

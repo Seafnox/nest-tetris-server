@@ -26,9 +26,9 @@ export class Game {
     }
 
     public nextTick(): void {
-        this.currentFigure.isLastAvailableX(this.gameState)
-            ? this.onFigureFall()
-            : this.currentFigure.onMove(this.gameState, Direction.DOWN);
+        this.currentFigure.hasClearFloor(this.gameState)
+            ? this.currentFigure.onMove(this.gameState, Direction.DOWN)
+            : this.onFigureFall();
     }
 
     public onMove(direction: Direction): void {
@@ -36,6 +36,10 @@ export class Game {
     }
 
     public onRoll(direction: Direction): void {
+        if (!this.currentFigure.isRollable) {
+            return;
+        }
+
         this.currentFigure.onRoll(this.gameState, direction);
     }
 

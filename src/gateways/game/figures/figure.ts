@@ -9,10 +9,11 @@ export abstract class Figure {
 
     public posX = GameConst.rowsCount;
     public posY = Math.round(GameConst.colsCount / 2);
+    public name = this.constructor.name;
 
     public abstract mapToState(state: GameState): GameState;
 
-    public abstract isLastAvailableX(state: GameState): boolean;
+    public abstract hasClearFloor(state: GameState): boolean;
 
     public abstract isLeftMoveAvailable(state: GameState): boolean;
 
@@ -21,9 +22,11 @@ export abstract class Figure {
     public abstract onRoll(state: GameState, direction: Direction): void;
 
     public dropInState(state: GameState): GameState {
-        while(!this.isLastAvailableX(state)) {
+        while(this.hasClearFloor(state)) {
             this.moveDown();
         }
+
+        console.log('dropInState', this.posX, this.posY, this.name);
 
         return this.mapToState(state);
     }
@@ -32,7 +35,7 @@ export abstract class Figure {
         switch (direction) {
             case Direction.LEFT: return this.isLeftMoveAvailable(state) ? this.moveLeft() : noop();
             case Direction.RIGHT: return this.isRightMoveAvailable(state) ? this.moveRight() : noop();
-            case Direction.DOWN: return !this.isLastAvailableX(state) ? this.moveDown() : noop();
+            case Direction.DOWN: return this.hasClearFloor(state) ? this.moveDown() : noop();
         }
     }
 

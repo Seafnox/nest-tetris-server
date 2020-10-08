@@ -21,11 +21,11 @@ export class Line extends Figure {
         }));
     }
 
-    public isLastAvailableX(state: GameState): boolean {
+    public hasClearFloor(state: GameState): boolean {
         const firstY = this.posY;
         const nextX = this.posX - 2;
 
-        return state[nextX][firstY] === CellState.EMPTY;
+        return nextX >= 0 && state[nextX][firstY] === CellState.EMPTY;
     }
 
     public isLeftMoveAvailable(state: GameState): boolean {
