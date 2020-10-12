@@ -192,8 +192,8 @@ $(function() {
     }
 
     const updateGameState = (state) => {
-        $gameField.innerHTML = state.map(row => ([
-            '<div>',
+        $gameField[0].innerHTML = state.map(row => ([
+            '<div class="gameRow">',
             row
                 .map(cell => (`<div class="gameCell ${cell === '.' ? '' : 'empty'}"></div>`))
                 .join(''),
@@ -202,8 +202,8 @@ $(function() {
     }
 
     const updateNextItem = (item) => {
-        $gameNextItem.innerHTML = item.map(row => ([
-            '<div>',
+        $gameNextItem[0].innerHTML = item.map(row => ([
+            '<div class="gameRow">',
             row
                 .map(cell => (`<div class="gameCell ${cell === '.' ? '' : 'empty'}"></div>`))
                 .join(''),
@@ -212,7 +212,7 @@ $(function() {
     }
 
     const updateScore = (value) => {
-        $gameScore.innerText = value;
+        $gameScore[0].innerText = value;
     }
 
     // Keyboard events
@@ -272,6 +272,7 @@ $(function() {
 
     socket.on('newGameState', data => {
         log(`newGameState: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        console.log('updateGameState', data.state);
         updateGameState(data.state);
     })
 
@@ -281,7 +282,7 @@ $(function() {
     })
 
     socket.on('newScore', data => {
-        log(`newNextItem: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
+        log(`newScore: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
         updateScore(data.value);
     })
 

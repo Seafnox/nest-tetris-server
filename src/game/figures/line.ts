@@ -1,16 +1,16 @@
 import { CellState } from '../cell-state';
 import { Direction } from '../direction';
-import { GameState } from '../game-state';
+import { GameState } from '../../interfaces/game-state';
 import { GameConst } from '../game.constants';
 import { Figure } from './figure';
 
 export class Line extends Figure {
     public isRollable = false;
     public view: GameState = [
-        [CellState.FILLED],
-        [CellState.FILLED],
-        [CellState.POINTER],
-        [CellState.FILLED],
+        [CellState.EMPTY, CellState.FILLED, CellState.EMPTY],
+        [CellState.EMPTY, CellState.FILLED, CellState.EMPTY],
+        [CellState.EMPTY, CellState.POINTER, CellState.EMPTY],
+        [CellState.EMPTY, CellState.FILLED, CellState.EMPTY],
     ];
 
     public mapToState(state: GameState): GameState {
@@ -44,5 +44,9 @@ export class Line extends Figure {
 
     public onRoll(state: GameState, direction: Direction): void {
         throw new Error(`${this.constructor.name} cannot rolling`);
+    }
+
+    public getInitialOffset(): number {
+        return 1;
     }
 }

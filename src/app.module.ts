@@ -4,6 +4,7 @@ import { AppService } from './services/app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { GameGateway } from './gateways/game/game.gateway';
+import { GameService } from './services/game.service';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { GameGateway } from './gateways/game/game.gateway';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, GameGateway],
+  providers: [AppService, GameService, GameGateway],
 })
 export class AppModule {}
