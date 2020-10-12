@@ -39,10 +39,10 @@ export class GameService {
 
             this.emit(clientId, 'newGameState', { state: game.getStateView() });
             this.emit(clientId, 'newScore', { value: game.score});
-        }
 
-        if (game.isFigureFall) {
-            this.emit(clientId, 'newNextItem', { item: game.nextFigure.getStateView() });
+            if (game.isFigureFall) {
+                this.emit(clientId, 'newNextItem', { item: game.nextFigure.getStateView() });
+            }
         }
     }
 
