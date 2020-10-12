@@ -262,6 +262,21 @@ $(function() {
         socket.emit('startGame');
     });
 
+    socket.on('newGameState', data => {
+        console.log('newGameState', data.state);
+        updateGameState(data.state);
+    })
+
+    socket.on('newNextItem', data => {
+        console.log('newNextItem', data.item);
+        updateNextItem(data.item);
+    })
+
+    socket.on('newScore', data => {
+        console.log('newScore', data.value);
+        updateScore(data.value);
+    })
+
     // Whenever the server emits 'new message', update the chat body
     socket.on('new message', (data) => {
         log(`new message: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
@@ -269,22 +284,6 @@ $(function() {
             addChatMessage(data);
         }
     });
-
-    socket.on('newGameState', data => {
-        log(`newGameState: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
-        console.log('updateGameState', data.state);
-        updateGameState(data.state);
-    })
-
-    socket.on('newNextItem', data => {
-        log(`newNextItem: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
-        updateNextItem(data.item);
-    })
-
-    socket.on('newScore', data => {
-        log(`newScore: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
-        updateScore(data.value);
-    })
 
     // Whenever the server emits 'user joined', log it in the chat body
     socket.on('user joined', (data) => {
