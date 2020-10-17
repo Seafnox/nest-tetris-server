@@ -26,7 +26,7 @@ export class GameService {
         const handler = userActionMap[event.eventName];
 
         if (!handler) {
-            throw new Error(`Cannot fild handler for event: ${JSON.stringify(event)}`);
+            throw new Error(`Cannot find handler for event: ${JSON.stringify(event)}`);
         }
 
         handler(event.clientId, event.data);
@@ -35,10 +35,14 @@ export class GameService {
     public startClientGame(clientId: string): void {
         const game = new Game();
 
-        this.emit(clientId, 'newGameState', { state: game.getStateView() });
-        this.emit(clientId, 'newNextItem', { item: game.nextFigure.getStateView() });
+        this.emitGameState(clientId, game);
+        this.emitScore(clientId, game);
+        this.emitNextItem(clientId, game);
+        this.emitLvl(clientId, game);
+
         this.games[clientId] = game;
-        this.subscriptions[clientId] = interval(1000).subscribe(() => this.nextGameTick(clientId));
+
+        this.restartGameSubscription(1000, clientId);
     }
 
     public stopClientGame(clientId: string): void {
@@ -90,17 +94,41 @@ export class GameService {
         if (!game.isGameOver) {
             game.nextTick();
 
-            this.emit(clientId, 'newGameState', { state: game.getStateView() });
-            this.emit(clientId, 'newScore', { value: game.score});
+            this.emitGameState(clientId, game);
+
+            if (game.isScoreIncremented) {
+                this.emitScore(clientId, game);
+            }
 
             if (game.isFigureFall) {
-                this.emit(clientId, 'newNextItem', { item: game.nextFigure.getStateView() });
+                this.emitNextItem(clientId, game);
+            }
+
+            if (game.isLvlUp) {
+                this.emitLvl(clientId, game);
+                this.restartGameSubscription(1000 - game.level*50, clientId);
             }
         }
     }
 
     private emit(clientId: string, eventName: string, data: object): void {
         this.emitter$.next({ clientId, eventName, data });
+    }
+
+    private emitGameState(clientId: string, game: Game): void {
+        this.emit(clientId, 'newGameState', { state: game.getStateView() });
+    }
+
+    private emitScore(clientId: string, game: Game): void {
+        this.emit(clientId, 'newScore', { value: game.score});
+    }
+
+    private emitLvl(clientId: string, game: Game): void {
+        this.emit(clientId, 'newLvl', { value: game.level});
+    }
+
+    private emitNextItem(clientId: string, game: Game): void {
+        this.emit(clientId, 'newNextItem', { item: game.nextFigure.getStateView() });
     }
 
     private dropPreviousGame(token: string): void {
@@ -119,5 +147,11 @@ export class GameService {
         this.subscriptions[token].unsubscribe();
 
         delete this.subscriptions[token];
+    }
+
+    private restartGameSubscription(timeout: number, clientId: string): void {
+        const realTimeout = timeout >= 10 ? timeout : 10;
+        this.dropPreviousGameSubscription(clientId);
+        this.subscriptions[clientId] = interval(realTimeout).subscribe(() => this.nextGameTick(clientId));
     }
 }

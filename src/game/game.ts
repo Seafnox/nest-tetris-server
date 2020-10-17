@@ -1,10 +1,10 @@
 import { Type } from '@nestjs/common';
+import { GameState } from '../interfaces/game-state';
 import { CellState } from './cell-state';
 import { Direction } from './direction';
 import { Figure } from './figures/figure';
 import { Line } from './figures/line';
 import { Square } from './figures/square';
-import { GameState } from '../interfaces/game-state';
 import { gameViewMap } from './game-view-map';
 import { GameConst } from './game.constants';
 
@@ -13,8 +13,12 @@ export class Game {
     public currentFigure: Figure;
     public nextFigure: Figure;
     public isGameOver: boolean;
+    public isScoreIncremented: boolean;
+    public isLvlUp: boolean;
     public isFigureFall: boolean;
     public score: number;
+    public level: number;
+    private nextLevelScore: number;
 
     private availableFigures: Type<Figure>[] = [
         Square,
@@ -22,10 +26,14 @@ export class Game {
     ];
 
     constructor() {
-        this.gameState = Array(GameConst.rowsCount).fill(null).map(() => Array(GameConst.colsCount).fill(null).map(() => CellState.EMPTY));
+        this.gameState = Array(GameConst.rowsCount).fill(null).map(this.generateRow.bind(this));
         this.isGameOver = false;
+        this.isScoreIncremented = false;
+        this.isLvlUp = false;
         this.isFigureFall = false;
         this.score = 0;
+        this.level = 1;
+        this.nextLevelScore = 1;
         this.currentFigure = this.getRandomFigure();
         this.currentFigure.onFirstStep();
 
@@ -33,7 +41,11 @@ export class Game {
     }
 
     public nextTick(): void {
+        this.isScoreIncremented = false;
+        this.isLvlUp = false;
         this.isFigureFall = false;
+
+        this.handleFilledRows();
 
         this.currentFigure.hasClearFloor(this.gameState)
             ? this.currentFigure.onMove(this.gameState, Direction.DOWN)
@@ -58,7 +70,15 @@ export class Game {
 
 
     public getStateView(): string[][] {
-        return this.currentFigure.mapToState(this.gameState).map(row => row.map(cell => gameViewMap[cell]));
+        return this.currentFigure.mapToState(this.gameState).map(row => row.map(cell => gameViewMap[cell])).reverse();
+    }
+
+    private generateRow(): CellState[] {
+        return Array(GameConst.colsCount).fill(null).map(this.generateCell.bind(this))
+    }
+
+    private generateCell(): CellState {
+        return CellState.EMPTY;
     }
 
     private onFigureFall(): void {
@@ -74,5 +94,45 @@ export class Game {
 
     private getRandomFigure(): Figure {
         return new this.availableFigures[Math.trunc(Math.random() * this.availableFigures.length)]
+    }
+
+    private handleFilledRows(): void {
+        if (!this.hasFilledRows()) {
+            return;
+        }
+
+        const newState = this.gameState.filter(row => !this.isRowFilled(row));
+        const filledRowCount = GameConst.rowsCount - newState.length;
+        console.log('calculate score', filledRowCount, this.level, this.score);
+        this.isScoreIncremented = true;
+        this.score = this.score + filledRowCount * this.level;
+
+        console.log('calculate lvlup', this.level, this.score, this.nextLevelScore);
+        if (this.score >= this.nextLevelScore) {
+            this.isLvlUp = true;
+            this.level = this.level + 1;
+            this.nextLevelScore = this.nextLevelScore * 2;
+            console.log('lvlup', this.level, this.score, this.nextLevelScore);
+        }
+
+        this.gameState = this.stabilizeState(newState);
+    }
+
+    private stabilizeState(state: GameState): GameState {
+        for(let i = 0; i < GameConst.rowsCount; i++) {
+            if (!state[i]) {
+                state[i] = this.generateRow();
+            }
+        }
+
+        return state;
+    }
+
+    private hasFilledRows(): boolean {
+        return this.gameState.some(this.isRowFilled);
+    }
+
+    private isRowFilled(row: CellState[]): boolean {
+        return !row.some(cell => cell === CellState.EMPTY);
     }
 }

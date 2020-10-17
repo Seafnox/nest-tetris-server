@@ -18,6 +18,7 @@ $(function() {
     var $gameField = $('.gameField');
     var $gameNextItem = $('.gameNextItem');
     var $gameScore = $('.gameScore');
+    var $gameLvl = $('.gameLvl');
 
     // Prompt for setting a username
     var username;
@@ -215,6 +216,10 @@ $(function() {
         $gameScore[0].innerText = value;
     }
 
+    const updateLvl = (value) => {
+        $gameLvl[0].innerText = value;
+    }
+
     const gameKeys = [
         "ArrowLeft",
         "ArrowRight",
@@ -290,18 +295,23 @@ $(function() {
     });
 
     socket.on('newGameState', data => {
-        console.log('newGameState', data.state);
+        console.log('newGameState');
         updateGameState(data.state);
     })
 
     socket.on('newNextItem', data => {
-        console.log('newNextItem', data.item);
+        console.log('newNextItem');
         updateNextItem(data.item);
     })
 
     socket.on('newScore', data => {
         console.log('newScore', data.value);
         updateScore(data.value);
+    })
+
+    socket.on('newLvl', data => {
+        console.log('newLvl', data.value);
+        updateLvl(data.value);
     })
 
     // Whenever the server emits 'new message', update the chat body

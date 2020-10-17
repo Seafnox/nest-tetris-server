@@ -26,7 +26,7 @@ export abstract class Figure {
     public abstract onRotate(state: GameState, direction: Direction): void;
 
     public getStateView(): string[][] {
-        return this.view.map(row => row.map(cell => gameViewMap[cell]));
+        return this.view.map(row => row.map(cell => gameViewMap[cell])).reverse();
     }
 
     public onFirstStep(): void {

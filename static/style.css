@@ -114,6 +114,10 @@ ul {
   font-size: 5em;
 }
 
+.gameLvl {
+  font-size: 3em;
+}
+
 .messages {
   font-size: 1em;
 }
@@ -181,6 +185,14 @@ ul {
   flex-grow: 4;
 }
 
+.gamelvl {
+  flex-grow: 2;
+}
+
+.gameSplitter {
+  display: flex;
+}
+
 .gameNextItem {
   flex-grow: 1;
   text-align: center;
@@ -204,7 +216,7 @@ ul {
 
 .gameField {
   border: 2px solid #000;
-  width: 75%;
+  flex-grow: 3;
   min-height: 200px;
   text-align: left;
 }
