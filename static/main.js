@@ -240,7 +240,6 @@ $(function() {
     //key: "ArrowUp", keyCode: 38
     //key: "ArrowDown", keyCode: 40
     $window.keydown(event => {
-        console.log(event);
         if (gameKeys.includes(event.key)) {
             $inputMessage.blur();
             event.preventDefault();
