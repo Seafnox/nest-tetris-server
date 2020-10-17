@@ -16,7 +16,6 @@ export class GameService {
     }
 
     public userAction(event: GameBridgeEvent): void {
-        console.log('userAction', event);
         const userActionMap: Record<string, (clientId: string, data: object) => void> = {
             moveFigure: this.onMoveFigure.bind(this),
             rotateFigure: this.onRotateFigure.bind(this),

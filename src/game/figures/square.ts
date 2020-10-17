@@ -34,7 +34,6 @@ export class Square extends Figure {
 
         const result = nextY >= 0 && this.isCellStateEmpty(state, firstX, nextY) && this.isCellStateEmpty(state, secondX, nextY);
 
-        console.log(`${this.constructor.name} is move left available: ${result}`);
         return result
     }
 
@@ -45,7 +44,6 @@ export class Square extends Figure {
 
         const result = nextY < GameConst.colsCount && this.isCellStateEmpty(state, firstX, nextY) && this.isCellStateEmpty(state, secondX, nextY);
 
-        console.log(`${this.constructor.name} is move right available: ${result}`);
         return result
     }
 

@@ -33,7 +33,6 @@ export class Line extends Figure {
         const nextY = this.posY - 1;
         const result = nextY >= 0 && !allX.some(posX => !this.isCellStateEmpty(state, posX, nextY));
 
-        console.log(`${this.constructor.name} is move left available: ${result}`);
         return result
     }
 
@@ -43,7 +42,6 @@ export class Line extends Figure {
 
         const result = nextY < GameConst.colsCount && !allX.some(posX => !this.isCellStateEmpty(state, posX, nextY));
 
-        console.log(`${this.constructor.name} is move right available: ${result}`);
         return result
     }
 

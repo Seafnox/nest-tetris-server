@@ -103,16 +103,13 @@ export class Game {
 
         const newState = this.gameState.filter(row => !this.isRowFilled(row));
         const filledRowCount = GameConst.rowsCount - newState.length;
-        console.log('calculate score', filledRowCount, this.level, this.score);
         this.isScoreIncremented = true;
         this.score = this.score + filledRowCount * this.level;
 
-        console.log('calculate lvlup', this.level, this.score, this.nextLevelScore);
         if (this.score >= this.nextLevelScore) {
             this.isLvlUp = true;
             this.level = this.level + 1;
             this.nextLevelScore = this.nextLevelScore * 2;
-            console.log('lvlup', this.level, this.score, this.nextLevelScore);
         }
 
         this.gameState = this.stabilizeState(newState);

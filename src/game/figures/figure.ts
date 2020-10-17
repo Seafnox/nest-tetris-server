@@ -38,20 +38,15 @@ export abstract class Figure {
             this.moveDown();
         }
 
-        console.log('dropInState', this.posX, this.posY, this.name);
-
         return this.mapToState(state);
     }
 
     public onMove(state: GameState, direction: Direction): void {
-        console.log('onMove', direction, this.isLeftMoveAvailable(state));
         switch (direction) {
             case Direction.LEFT: {
-                console.log('onMove', direction, this.isLeftMoveAvailable(state));
                 return this.isLeftMoveAvailable(state) ? this.moveLeft() : noop();
             }
             case Direction.RIGHT: {
-                console.log('onMove', direction, this.isLeftMoveAvailable(state));
                 return this.isRightMoveAvailable(state) ? this.moveRight() : noop();
             }
             case Direction.DOWN: return this.hasClearFloor(state) ? this.moveDown() : noop();
@@ -59,12 +54,10 @@ export abstract class Figure {
     }
 
     protected moveLeft(): void {
-        console.log(`${this.constructor.name} move left`);
         this.posY = this.posY - 1;
     }
 
     protected moveRight(): void {
-        console.log(`${this.constructor.name} move right`);
         this.posY = this.posY + 1;
     }
 
