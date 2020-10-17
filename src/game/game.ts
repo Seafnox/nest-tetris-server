@@ -44,13 +44,18 @@ export class Game {
         this.currentFigure.onMove(this.gameState, direction);
     }
 
-    public onRoll(direction: Direction): void {
+    public onRotate(direction: Direction): void {
         if (!this.currentFigure.isRollable) {
             return;
         }
 
-        this.currentFigure.onRoll(this.gameState, direction);
+        this.currentFigure.onRotate(this.gameState, direction);
     }
+
+    public onDrop(): void {
+        this.currentFigure.dropInState(this.gameState);
+    }
+
 
     public getStateView(): string[][] {
         return this.currentFigure.mapToState(this.gameState).map(row => row.map(cell => gameViewMap[cell]));

@@ -20,10 +20,41 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.broadcastFromClient(client, 'user joined', { numUsers: this.getConnectedClientCount() });
     this.emitToClient(client, 'login', { numUsers: this.getConnectedClientCount() });
   }
+
   @SubscribeMessage('startGame')
   startGame(client: XSocketClient, payload: any): void {
     console.log('startGame', client.id, client.name, JSON.stringify(payload));
     this.gameService.startClientGame(client.id);
+  }
+
+  @SubscribeMessage('moveFigure')
+  moveFigure(client: XSocketClient, payload: any): void {
+    console.log('moveFigure', client.id, client.name, JSON.stringify(payload));
+    this.gameService.userAction({
+      eventName: 'moveFigure',
+      data: {payload},
+      clientId: client.id,
+    });
+  }
+
+  @SubscribeMessage('rotateFigure')
+  rotateFigure(client: XSocketClient, payload: any): void {
+    console.log('rotateFigure', client.id, client.name, JSON.stringify(payload));
+    this.gameService.userAction({
+      eventName: 'rotateFigure',
+      data: {payload},
+      clientId: client.id,
+    });
+  }
+
+  @SubscribeMessage('dropFigure')
+  dropFigure(client: XSocketClient, payload: any): void {
+    console.log('dropFigure', client.id, client.name, JSON.stringify(payload));
+    this.gameService.userAction({
+      eventName: 'dropFigure',
+      data: {payload},
+      clientId: client.id,
+    });
   }
 
   @SubscribeMessage('new message')

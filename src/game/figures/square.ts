@@ -24,7 +24,7 @@ export class Square extends Figure {
         const secondY = this.posY;
         const nextX = this.posX - 1;
 
-        return nextX >= 0 && state[nextX][firstY] === CellState.EMPTY && state[nextX][secondY] === CellState.EMPTY;
+        return nextX >= 0 && this.isCellStateEmpty(state, nextX, firstY) && this.isCellStateEmpty(state, nextX, secondY);
     }
 
     public isLeftMoveAvailable(state: GameState): boolean {
@@ -32,7 +32,10 @@ export class Square extends Figure {
         const secondX = this.posX;
         const nextY = this.posY - 2;
 
-        return nextY > 0 && state[firstX][nextY] === CellState.EMPTY && state[secondX][nextY] === CellState.EMPTY;
+        const result = nextY >= 0 && this.isCellStateEmpty(state, firstX, nextY) && this.isCellStateEmpty(state, secondX, nextY);
+
+        console.log(`${this.constructor.name} is move left available: ${result}`);
+        return result
     }
 
     public isRightMoveAvailable(state: GameState): boolean {
@@ -40,10 +43,13 @@ export class Square extends Figure {
         const secondX = this.posX;
         const nextY = this.posY + 1;
 
-        return nextY < GameConst.colsCount && state[firstX][nextY] === CellState.EMPTY && state[secondX][nextY] === CellState.EMPTY;
+        const result = nextY < GameConst.colsCount && this.isCellStateEmpty(state, firstX, nextY) && this.isCellStateEmpty(state, secondX, nextY);
+
+        console.log(`${this.constructor.name} is move right available: ${result}`);
+        return result
     }
 
-    public onRoll(state: GameState, direction: Direction): void {
+    public onRotate(state: GameState, direction: Direction): void {
         throw new Error(`${this.constructor.name} cannot rolling`);
     }
 

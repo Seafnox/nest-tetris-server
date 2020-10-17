@@ -25,24 +25,29 @@ export class Line extends Figure {
         const firstY = this.posY;
         const nextX = this.posX - 2;
 
-        return nextX >= 0 && state[nextX][firstY] === CellState.EMPTY;
+        return nextX >= 0 && this.isCellStateEmpty(state, nextX, firstY);
     }
 
     public isLeftMoveAvailable(state: GameState): boolean {
         const allX = [this.posX - 1, this.posX, this.posX + 1, this.posX + 2];
         const nextY = this.posY - 1;
+        const result = nextY >= 0 && !allX.some(posX => !this.isCellStateEmpty(state, posX, nextY));
 
-        return nextY > 0 && !allX.some(posX => state[posX][nextY] !== CellState.EMPTY);
+        console.log(`${this.constructor.name} is move left available: ${result}`);
+        return result
     }
 
     public isRightMoveAvailable(state: GameState): boolean {
         const allX = [this.posX - 1, this.posX, this.posX + 1, this.posX + 2];
         const nextY = this.posY + 1;
 
-        return nextY < GameConst.colsCount && !allX.some(posX => state[posX][nextY] !== CellState.EMPTY);
+        const result = nextY < GameConst.colsCount && !allX.some(posX => !this.isCellStateEmpty(state, posX, nextY));
+
+        console.log(`${this.constructor.name} is move right available: ${result}`);
+        return result
     }
 
-    public onRoll(state: GameState, direction: Direction): void {
+    public onRotate(state: GameState, direction: Direction): void {
         throw new Error(`${this.constructor.name} cannot rolling`);
     }
 

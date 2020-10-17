@@ -215,9 +215,36 @@ $(function() {
         $gameScore[0].innerText = value;
     }
 
-    // Keyboard events
+    const gameKeys = [
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+    ];
 
+    const gameActions = (socket) => ({
+        ArrowLeft: socket.emit.bind(socket, 'moveFigure', 'left'),
+        ArrowRight: socket.emit.bind(socket, 'moveFigure', 'right'),
+        ArrowUp: socket.emit.bind(socket, 'rotateFigure', 'right'),
+        ArrowDown: socket.emit.bind(socket, 'dropFigure'),
+    });
+
+    // Keyboard events
+    //key: "ArrowLeft", keyCode: 37
+    //key: "ArrowRight", keyCode: 39
+    //key: "ArrowUp", keyCode: 38
+    //key: "ArrowDown", keyCode: 40
     $window.keydown(event => {
+        console.log(event);
+        if (gameKeys.includes(event.key)) {
+            $inputMessage.blur();
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            gameActions(socket)[event.key]();
+
+            return;
+        }
         // Auto-focus the current input when a key is typed
         if (username && !(event.ctrlKey || event.metaKey || event.altKey)) {
             $inputMessage.focus();
