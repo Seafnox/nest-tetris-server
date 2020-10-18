@@ -47,7 +47,7 @@ export class Game {
 
         this.handleFilledRows();
 
-        this.currentFigure.hasClearFloor(this.gameState)
+        this.currentFigure.isDownMoveAvailable(this.gameState)
             ? this.currentFigure.onMove(this.gameState, Direction.DOWN)
             : this.onFigureFall();
     }
@@ -57,17 +57,12 @@ export class Game {
     }
 
     public onRotate(direction: Direction): void {
-        if (!this.currentFigure.isRollable) {
-            return;
-        }
-
         this.currentFigure.onRotate(this.gameState, direction);
     }
 
     public onDrop(): void {
         this.currentFigure.dropInState(this.gameState);
     }
-
 
     public getStateView(): string[][] {
         return this.currentFigure.mapToState(this.gameState).map(row => row.map(cell => gameViewMap[cell])).reverse();
@@ -87,7 +82,7 @@ export class Game {
         this.currentFigure = this.nextFigure;
         this.nextFigure = this.getRandomFigure();
 
-        this.currentFigure.hasClearFloor(this.gameState)
+        this.currentFigure.isDownMoveAvailable(this.gameState)
             ? this.currentFigure.onFirstStep()
             : this.isGameOver = true;
     }
