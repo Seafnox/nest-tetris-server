@@ -3,8 +3,13 @@ import { GameState } from '../interfaces/game-state';
 import { CellState } from './cell-state';
 import { Direction } from './direction';
 import { Figure } from './figures/figure';
-import { Line } from './figures/line';
-import { Square } from './figures/square';
+import { IFigure } from './figures/IFigure';
+import { JFigure } from './figures/JFigure';
+import { LFigure } from './figures/LFigure';
+import { OFigure } from './figures/OFigure';
+import { SFigure } from './figures/SFigure';
+import { TFigure } from './figures/TFigure';
+import { ZFigure } from './figures/ZFigure';
 import { gameViewMap } from './game-view-map';
 import { GameConst } from './game.constants';
 
@@ -21,8 +26,13 @@ export class Game {
     private nextLevelScore: number;
 
     private availableFigures: Type<Figure>[] = [
-        Square,
-        Line,
+        OFigure,
+        IFigure,
+        SFigure,
+        ZFigure,
+        LFigure,
+        JFigure,
+        TFigure,
     ];
 
     constructor() {

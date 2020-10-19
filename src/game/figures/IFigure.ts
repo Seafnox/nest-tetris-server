@@ -2,7 +2,7 @@ import { CellState } from '../cell-state';
 import { GameState } from '../../interfaces/game-state';
 import { Figure } from './figure';
 
-export class Line extends Figure {
+export class IFigure extends Figure {
     public getViews(): GameState[] {
         return [
             // vertical

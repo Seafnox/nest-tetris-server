@@ -2,7 +2,7 @@ import { CellState } from '../cell-state';
 import { GameState } from '../../interfaces/game-state';
 import { Figure } from './figure';
 
-export class Square extends Figure {
+export class OFigure extends Figure {
     public getViews(): GameState[] {
         return [
             [
