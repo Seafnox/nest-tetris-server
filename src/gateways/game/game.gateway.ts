@@ -2,14 +2,18 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server } from 'socket.io';
 import { GameService } from '../../services/game.service';
 import { XSocketClient } from '../../interfaces/x-socket-client';
+import { RoomService } from '../../services/room.service';
 
 @WebSocketGateway()
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
 
-  constructor(private gameService: GameService) {
-    this.gameService.emit$().subscribe(event => this.emit(event.playerId, event.eventName, event.data));
+  constructor(
+      private roomService: RoomService,
+      private gameService: GameService
+  ) {
+    this.roomService.emit$().subscribe(event => this.emit(event.receiverId, event.initiatorId, event.eventName, event.data));
   }
 
   @SubscribeMessage('add user')
@@ -21,10 +25,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.emitToPlayer(player, 'login', { numUsers: this.getConnectedClientCount() });
   }
 
-  @SubscribeMessage('startGame')
+  @SubscribeMessage('register')
   startGame(player: XSocketClient, payload: any): void {
-    console.log('startGame', player.id, player.name, JSON.stringify(payload));
-    this.gameService.startPlayerGame(player.id);
+    console.log('register', player.id, player.name, JSON.stringify(payload));
+    const roomId = this.roomService.findFreeRoom();
+    this.roomService.registerPlayerInRoom(player.id, roomId);
   }
 
   @SubscribeMessage('moveFigure')
@@ -82,7 +87,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   public handleDisconnect(player: XSocketClient): any {
     console.log('disconnected', player.id, player.name);
 
-    this.gameService.stopPlayerGame(player.id);
+    this.roomService.unregisterPlayer(player.id);
 
     this.broadcastFromClient(player,'user left', { numUsers: this.getConnectedClientCount() });
   }
@@ -103,10 +108,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit(eventName, data);
   }
 
-  private emit(playerId: string, eventName: string, data: object = {}): void {
-    const player: XSocketClient = this.server.clients().connected[playerId];
+  private emit(targetId: string, sourceId: string, eventName: string, data: object): void {
+    const target: XSocketClient = this.server.clients().connected[targetId];
 
-    this.emitToPlayer(player, eventName, data);
+    this.emitToPlayer(target, eventName, {sourceId, data});
   }
 
   private emitToPlayer(player: XSocketClient, eventName: string, data: object = {}): void {
