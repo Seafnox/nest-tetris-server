@@ -16,7 +16,7 @@ export class GameService {
     }
 
     public userAction(event: GameBridgeEvent): void {
-        const userActionMap: Record<string, (clientId: string, data: object) => void> = {
+        const userActionMap: Record<string, (playerId: string, data: object) => void> = {
             moveFigure: this.onMoveFigure.bind(this),
             rotateFigure: this.onRotateFigure.bind(this),
             dropFigure: this.onDropFigure.bind(this),
@@ -28,46 +28,46 @@ export class GameService {
             throw new Error(`Cannot find handler for event: ${JSON.stringify(event)}`);
         }
 
-        handler(event.clientId, event.data);
+        handler(event.playerId, event.data);
     }
 
-    public startClientGame(clientId: string): void {
+    public startPlayerGame(playerId: string): void {
         const game = new Game();
 
-        this.emitGameState(clientId, game);
-        this.emitScore(clientId, game);
-        this.emitNextItem(clientId, game);
-        this.emitLvl(clientId, game);
+        this.emitGameState(playerId, game);
+        this.emitScore(playerId, game);
+        this.emitNextItem(playerId, game);
+        this.emitLvl(playerId, game);
 
-        this.games[clientId] = game;
+        this.games[playerId] = game;
 
-        this.restartGameSubscription(1000, clientId);
+        this.restartGameSubscription(1000, playerId);
     }
 
-    public stopClientGame(clientId: string): void {
-        this.dropPreviousGameSubscription(clientId);
-        this.dropPreviousGame(clientId);
+    public stopPlayerGame(playerId: string): void {
+        this.dropPreviousGameSubscription(playerId);
+        this.dropPreviousGame(playerId);
     }
 
-    private onMoveFigure(clientId: string, data: { payload: string}): void {
-        const game = this.getGame(clientId);
+    private onMoveFigure(playerId: string, data: { payload: string}): void {
+        const game = this.getGame(playerId);
         game.onMove(this.getDirection(data.payload));
 
-        this.emit(clientId, 'newGameState', { state: game.getStateView() });
+        this.emit(playerId, 'newGameState', { state: game.getStateView() });
     }
 
-    private onRotateFigure(clientId: string, data: { payload: string}): void {
-        const game = this.getGame(clientId);
+    private onRotateFigure(playerId: string, data: { payload: string}): void {
+        const game = this.getGame(playerId);
         game.onRotate(this.getDirection(data.payload));
 
-        this.emit(clientId, 'newGameState', { state: game.getStateView() });
+        this.emit(playerId, 'newGameState', { state: game.getStateView() });
     }
 
-    private onDropFigure(clientId: string): void {
-        const game = this.getGame(clientId);
+    private onDropFigure(playerId: string): void {
+        const game = this.getGame(playerId);
         game.onDrop();
 
-        this.emit(clientId, 'newGameState', { state: game.getStateView() });
+        this.emit(playerId, 'newGameState', { state: game.getStateView() });
     }
 
     private getDirection(directionStr: string): Direction {
@@ -79,55 +79,55 @@ export class GameService {
         }
     }
 
-    private getGame(clientId: string): Game {
-        if (!this.games[clientId]) {
-            throw new Error(`Cannot find game for client: ${clientId}`);
+    private getGame(playerId: string): Game {
+        if (!this.games[playerId]) {
+            throw new Error(`Cannot find game for player: ${playerId}`);
         }
 
-        return this.games[clientId];
+        return this.games[playerId];
     }
 
-    private nextGameTick(clientId: string): void {
-        const game = this.games[clientId];
+    private nextGameTick(playerId: string): void {
+        const game = this.games[playerId];
 
         if (!game.isGameOver) {
             game.nextTick();
 
-            this.emitGameState(clientId, game);
+            this.emitGameState(playerId, game);
 
             if (game.isScoreIncremented) {
-                this.emitScore(clientId, game);
+                this.emitScore(playerId, game);
             }
 
             if (game.isFigureFall) {
-                this.emitNextItem(clientId, game);
+                this.emitNextItem(playerId, game);
             }
 
             if (game.isLvlUp) {
-                this.emitLvl(clientId, game);
-                this.restartGameSubscription(1000 - game.level*50, clientId);
+                this.emitLvl(playerId, game);
+                this.restartGameSubscription(1000 - game.level*50, playerId);
             }
         }
     }
 
-    private emit(clientId: string, eventName: string, data: object): void {
-        this.emitter$.next({ clientId, eventName, data });
+    private emit(playerId: string, eventName: string, data: object): void {
+        this.emitter$.next({ playerId, eventName, data });
     }
 
-    private emitGameState(clientId: string, game: Game): void {
-        this.emit(clientId, 'newGameState', { state: game.getStateView() });
+    private emitGameState(playerId: string, game: Game): void {
+        this.emit(playerId, 'newGameState', { state: game.getStateView() });
     }
 
-    private emitScore(clientId: string, game: Game): void {
-        this.emit(clientId, 'newScore', { value: game.score});
+    private emitScore(playerId: string, game: Game): void {
+        this.emit(playerId, 'newScore', { value: game.score});
     }
 
-    private emitLvl(clientId: string, game: Game): void {
-        this.emit(clientId, 'newLvl', { value: game.level});
+    private emitLvl(playerId: string, game: Game): void {
+        this.emit(playerId, 'newLvl', { value: game.level});
     }
 
-    private emitNextItem(clientId: string, game: Game): void {
-        this.emit(clientId, 'newNextItem', { item: game.nextFigure.getStateView() });
+    private emitNextItem(playerId: string, game: Game): void {
+        this.emit(playerId, 'newNextItem', { item: game.nextFigure.getStateView() });
     }
 
     private dropPreviousGame(token: string): void {
@@ -148,9 +148,9 @@ export class GameService {
         delete this.subscriptions[token];
     }
 
-    private restartGameSubscription(timeout: number, clientId: string): void {
+    private restartGameSubscription(timeout: number, playerId: string): void {
         const realTimeout = timeout >= 10 ? timeout : 10;
-        this.dropPreviousGameSubscription(clientId);
-        this.subscriptions[clientId] = interval(realTimeout).subscribe(() => this.nextGameTick(clientId));
+        this.dropPreviousGameSubscription(playerId);
+        this.subscriptions[playerId] = interval(realTimeout).subscribe(() => this.nextGameTick(playerId));
     }
 }

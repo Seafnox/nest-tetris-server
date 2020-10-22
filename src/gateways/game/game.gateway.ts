@@ -9,92 +9,92 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private server: Server;
 
   constructor(private gameService: GameService) {
-    this.gameService.emit$().subscribe(event => this.emit(event.clientId, event.eventName, event.data));
+    this.gameService.emit$().subscribe(event => this.emit(event.playerId, event.eventName, event.data));
   }
 
   @SubscribeMessage('add user')
-  addUser(client: XSocketClient, payload: any): void {
-    client.name = payload.toString();
-    console.log('addUser', client.id, client.name);
+  addUser(player: XSocketClient, payload: any): void {
+    player.name = payload.toString();
+    console.log('addUser', player.id, player.name);
 
-    this.broadcastFromClient(client, 'user joined', { numUsers: this.getConnectedClientCount() });
-    this.emitToClient(client, 'login', { numUsers: this.getConnectedClientCount() });
+    this.broadcastFromClient(player, 'user joined', { numUsers: this.getConnectedClientCount() });
+    this.emitToPlayer(player, 'login', { numUsers: this.getConnectedClientCount() });
   }
 
   @SubscribeMessage('startGame')
-  startGame(client: XSocketClient, payload: any): void {
-    console.log('startGame', client.id, client.name, JSON.stringify(payload));
-    this.gameService.startClientGame(client.id);
+  startGame(player: XSocketClient, payload: any): void {
+    console.log('startGame', player.id, player.name, JSON.stringify(payload));
+    this.gameService.startPlayerGame(player.id);
   }
 
   @SubscribeMessage('moveFigure')
-  moveFigure(client: XSocketClient, payload: any): void {
-    console.log('moveFigure', client.id, client.name, JSON.stringify(payload));
+  moveFigure(player: XSocketClient, payload: any): void {
+    console.log('moveFigure', player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
       eventName: 'moveFigure',
       data: {payload},
-      clientId: client.id,
+      playerId: player.id,
     });
   }
 
   @SubscribeMessage('rotateFigure')
-  rotateFigure(client: XSocketClient, payload: any): void {
-    console.log('rotateFigure', client.id, client.name, JSON.stringify(payload));
+  rotateFigure(player: XSocketClient, payload: any): void {
+    console.log('rotateFigure', player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
       eventName: 'rotateFigure',
       data: {payload},
-      clientId: client.id,
+      playerId: player.id,
     });
   }
 
   @SubscribeMessage('dropFigure')
-  dropFigure(client: XSocketClient, payload: any): void {
-    console.log('dropFigure', client.id, client.name, JSON.stringify(payload));
+  dropFigure(player: XSocketClient, payload: any): void {
+    console.log('dropFigure', player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
       eventName: 'dropFigure',
       data: {payload},
-      clientId: client.id,
+      playerId: player.id,
     });
   }
 
   @SubscribeMessage('new message')
-  newMessage(client: XSocketClient, payload: any): void {
-    console.log('newMessage', client.id, client.name, JSON.stringify(payload));
-    this.broadcastFromClient(client, 'new message', { message: payload.toString(), typing: false });
+  newMessage(player: XSocketClient, payload: any): void {
+    console.log('newMessage', player.id, player.name, JSON.stringify(payload));
+    this.broadcastFromClient(player, 'new message', { message: payload.toString(), typing: false });
   }
 
   @SubscribeMessage('typing')
-  typing(client: XSocketClient): void {
-    console.log('typing', client.id, client.name);
-    this.broadcastFromClient(client, 'typing');
+  typing(player: XSocketClient): void {
+    console.log('typing', player.id, player.name);
+    this.broadcastFromClient(player, 'typing');
   }
 
   @SubscribeMessage('stop typing')
-  stopTyping(client: XSocketClient): void {
-    console.log('stop typing', client.id, client.name);
-    this.broadcastFromClient(client,'stop typing');
+  stopTyping(player: XSocketClient): void {
+    console.log('stop typing', player.id, player.name);
+    this.broadcastFromClient(player,'stop typing');
   }
 
-  public handleConnection(client: XSocketClient, ...args: any[]): any {
-    console.log('connected', client.id, client.name, args);
+  public handleConnection(player: XSocketClient, ...args: any[]): any {
+    console.log('connected', player.id, player.name, args);
   }
 
-  public handleDisconnect(client: XSocketClient): any {
-    console.log('disconnected', client.id, client.name);
+  public handleDisconnect(player: XSocketClient): any {
+    console.log('disconnected', player.id, player.name);
 
-    this.gameService.stopClientGame(client.id);
+    this.gameService.stopPlayerGame(player.id);
 
-    this.broadcastFromClient(client,'user left', { numUsers: this.getConnectedClientCount() });
+    this.broadcastFromClient(player,'user left', { numUsers: this.getConnectedClientCount() });
   }
 
   private getConnectedClientCount(): number {
     return Object.keys(this.server.clients().connected).length;
   }
 
-  private broadcastFromClient(client: XSocketClient, eventName: string, data: object = {}): void {
+  private broadcastFromClient(player: XSocketClient, eventName: string, data: object = {}): void {
     this.broadcast(eventName, {
-      id: client.id,
-      name: client.name,
+      id: player.id,
+      name: player.name,
       ...data,
     })
   }
@@ -103,16 +103,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit(eventName, data);
   }
 
-  private emit(clientId: string, eventName: string, data: object = {}): void {
-    const client: XSocketClient = this.server.clients().connected[clientId];
+  private emit(playerId: string, eventName: string, data: object = {}): void {
+    const player: XSocketClient = this.server.clients().connected[playerId];
 
-    this.emitToClient(client, eventName, data);
+    this.emitToPlayer(player, eventName, data);
   }
 
-  private emitToClient(client: XSocketClient, eventName: string, data: object = {}): void {
-    client.emit( eventName, {
-      id: client.id,
-      username: client.name,
+  private emitToPlayer(player: XSocketClient, eventName: string, data: object = {}): void {
+    player.emit( eventName, {
+      id: player.id,
+      username: player.name,
       ...data,
     });
   }

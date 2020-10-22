@@ -1,5 +1,5 @@
 export interface GameBridgeEvent {
-    clientId: string,
+    playerId: string,
     eventName: string,
     data: object,
 }
