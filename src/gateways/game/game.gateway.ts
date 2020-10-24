@@ -8,6 +8,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
 
+  private watchers: string[] = [];
+
   constructor(private gameService: GameService) {
     this.gameService.emit$().subscribe(event => this.emit(event.playerId, event.eventName, event.data));
   }
@@ -17,14 +19,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     player.name = payload.toString();
     console.log('addUser', player.id, player.name);
 
-    this.broadcastFromClient(player, 'user joined', { numUsers: this.getConnectedClientCount() });
-    this.emitToPlayer(player, 'login', { numUsers: this.getConnectedClientCount() });
+    this.broadcastFromPlayer(player, 'user joined', { numUsers: this.getConnectedClientCount() });
+    this.emitToWatcher(player, player, 'login', { numUsers: this.getConnectedClientCount() });
   }
 
   @SubscribeMessage('startGame')
   startGame(player: XSocketClient, payload: any): void {
     console.log('startGame', player.id, player.name, JSON.stringify(payload));
+    this.watchers = this.watchers.filter(watcherId => watcherId !== player.id);
+
     this.gameService.startPlayerGame(player.id);
+  }
+
+  @SubscribeMessage('startWatching')
+  startWatching(player: XSocketClient, payload: any): void {
+    console.log('startWatching', player.id, player.name, JSON.stringify(payload));
+    this.gameService.stopPlayerGame(player.id);
+
+    this.watchers = [player.id, ...this.watchers];
   }
 
   @SubscribeMessage('moveFigure')
@@ -57,24 +69,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  @SubscribeMessage('new message')
-  newMessage(player: XSocketClient, payload: any): void {
-    console.log('newMessage', player.id, player.name, JSON.stringify(payload));
-    this.broadcastFromClient(player, 'new message', { message: payload.toString(), typing: false });
-  }
-
-  @SubscribeMessage('typing')
-  typing(player: XSocketClient): void {
-    console.log('typing', player.id, player.name);
-    this.broadcastFromClient(player, 'typing');
-  }
-
-  @SubscribeMessage('stop typing')
-  stopTyping(player: XSocketClient): void {
-    console.log('stop typing', player.id, player.name);
-    this.broadcastFromClient(player,'stop typing');
-  }
-
   public handleConnection(player: XSocketClient, ...args: any[]): any {
     console.log('connected', player.id, player.name, args);
   }
@@ -84,14 +78,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.gameService.stopPlayerGame(player.id);
 
-    this.broadcastFromClient(player,'user left', { numUsers: this.getConnectedClientCount() });
+    this.broadcastFromPlayer(player,'user left', { numUsers: this.getConnectedClientCount() });
   }
 
   private getConnectedClientCount(): number {
     return Object.keys(this.server.clients().connected).length;
   }
 
-  private broadcastFromClient(player: XSocketClient, eventName: string, data: object = {}): void {
+  private broadcastFromPlayer(player: XSocketClient, eventName: string, data: object = {}): void {
     this.broadcast(eventName, {
       id: player.id,
       name: player.name,
@@ -104,13 +98,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private emit(playerId: string, eventName: string, data: object = {}): void {
+    const targetIds = [playerId, ...this.watchers];
     const player: XSocketClient = this.server.clients().connected[playerId];
 
-    this.emitToPlayer(player, eventName, data);
+    targetIds.forEach(targetId => {
+      const watcher: XSocketClient = this.server.clients().connected[targetId];
+
+      this.emitToWatcher(watcher, player, eventName, data);
+    })
   }
 
-  private emitToPlayer(player: XSocketClient, eventName: string, data: object = {}): void {
-    player.emit( eventName, {
+  private emitToWatcher(watcher: XSocketClient, player: XSocketClient, eventName: string, data: object = {}): void {
+    watcher.emit( eventName, {
       id: player.id,
       username: player.name,
       ...data,

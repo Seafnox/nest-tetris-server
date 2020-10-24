@@ -1,30 +1,23 @@
 $(function() {
     var FADE_TIME = 150; // ms
-    var TYPING_TIMER_LENGTH = 400; // ms
-    var COLORS = [
-        '#e21400', '#91580f', '#f8a700', '#f78b00',
-        '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
-        '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
-    ];
 
     // Initialize variables
     var $window = $(window);
-    var $usernameInput = $('.usernameInput'); // Input for username
-    var $messages = $('.messages'); // Messages area
-    var $inputMessage = $('.inputMessage'); // Input message input box
+    var $usernameInput = $('#usernameInput'); // Input for username
+    var $messages = $('#messages'); // Messages area
 
-    var $loginPage = $('.login.page'); // The login page
-    var $chatPage = $('.game.page'); // The chatroom page
-    var $gameField = $('.gameField');
-    var $gameNextItem = $('.gameNextItem');
-    var $gameScore = $('.gameScore');
-    var $gameLvl = $('.gameLvl');
+    var $loginPage = $('#loginPage'); // The login page
+    var $gamePage = $('#gamePage'); // The chatroom page
+    var $watchingPage = $('#watchingPage'); // The chatroom page
+    var $watchButton = $('.watchButton');
+    var $playButton = $('.playButton');
+    var $ownGameContainer = $('#ownGame');
+    var $watchingRootContainer = $('#watchedGames');
+    var $watchingContainers = {};
+    var isWatchingMode = false;
 
     // Prompt for setting a username
     var username;
-    var connected = false;
-    var typing = false;
-    var lastTypingTime;
     $usernameInput.val(`test-${Math.floor(Math.random()*1000)}`);
 
     var socket = io();
@@ -46,29 +39,11 @@ $(function() {
         // If the username is valid
         if (username) {
             $loginPage.fadeOut();
-            $chatPage.show();
+            $gamePage.show();
             $loginPage.off('click');
-            $inputMessage.focus();
 
             // Tell the server your username
             socket.emit('add user', username);
-        }
-    }
-
-    // Sends a chat message
-    const sendMessage = () => {
-        var message = $inputMessage.val();
-        // Prevent markup from being injected into the message
-        message = cleanInput(message);
-        // if there is a non-empty message and a socket connection
-        if (message && connected) {
-            $inputMessage.val('');
-            addChatMessage({
-                username: username,
-                message: message
-            });
-            // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', message);
         }
     }
 
@@ -78,50 +53,6 @@ $(function() {
         addMessageElement($el, options);
     }
 
-    // Adds the visual chat message to the message list
-    const addChatMessage = (data, options) => {
-        // Don't fade the message in if there is an 'X was typing'
-        var $typingMessages = getTypingMessages(data);
-        options = options || {};
-        if ($typingMessages.length !== 0) {
-            options.fade = false;
-            $typingMessages.remove();
-        }
-
-        var $usernameDiv = $('<span class="username"/>')
-            .text(data.username)
-            .css('color', getUsernameColor(data.username));
-        var $messageBodyDiv = $('<span class="messageBody">')
-            .text(data.message);
-
-        var typingClass = data.typing ? 'typing' : '';
-        var $messageDiv = $('<div class="message"/>')
-            .data('username', data.username)
-            .addClass(typingClass)
-            .append($usernameDiv, $messageBodyDiv);
-
-        addMessageElement($messageDiv, options);
-    }
-
-    // Adds the visual chat typing message
-    const addChatTyping = (data) => {
-        data.typing = true;
-        data.message = 'is typing';
-        addChatMessage(data);
-    }
-
-    // Removes the visual chat typing message
-    const removeChatTyping = (data) => {
-        getTypingMessages(data).fadeOut(function () {
-            $(this).remove();
-        });
-    }
-
-    // Adds a message element to the messages and scrolls to the bottom
-    // el - The element to add as a message
-    // options.fade - If the element should fade-in (default = true)
-    // options.prepend - If the element should prepend
-    //   all other messages (default = false)
     const addMessageElement = (el, options) => {
         var $el = $(el);
 
@@ -132,94 +63,92 @@ $(function() {
         if (typeof options.fade === 'undefined') {
             options.fade = true;
         }
-        if (typeof options.prepend === 'undefined') {
-            options.prepend = false;
-        }
 
         // Apply options
         if (options.fade) {
             $el.hide().fadeIn(FADE_TIME);
         }
-        if (options.prepend) {
-            $messages.prepend($el);
-        } else {
-            $messages.append($el);
-        }
+        $messages.append($el);
         $messages[0].scrollTop = $messages[0].scrollHeight;
     }
 
     // Prevents input from having injected markup
-    const cleanInput = (input) => {
-        return $('<div/>').text(input).html();
+    const cleanInput = (input) => $('<div/>').text(input).html();
+
+    const createGameView = ($parent) => {
+        $parent[0].innerHtml = `<game-wrapper></game-wrapper>`;
+
+        return getGameViewSimple($parent);
     }
 
-    // Updates the typing event
-    const updateTyping = () => {
-        if (connected) {
-            if (!typing) {
-                typing = true;
-                socket.emit('typing');
-            }
-            lastTypingTime = (new Date()).getTime();
-
-            setTimeout(() => {
-                var typingTimer = (new Date()).getTime();
-                var timeDiff = typingTimer - lastTypingTime;
-                if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-                    socket.emit('stop typing');
-                    typing = false;
-                }
-            }, TYPING_TIMER_LENGTH);
-        }
+    const getGameViewSimple = ($parent) => {
+        return $parent[0].getElementsByTagName('game-wrapper')[0];
     }
 
-    // Gets the 'X is typing' messages of a user
-    const getTypingMessages = (data) => {
-        return $('.typing.message').filter(function (i) {
-            return $(this).data('username') === data.username;
-        });
+    const getGameView = ($parent) => {
+        return getGameViewSimple($parent) || createGameView($parent);
     }
 
-    // Gets the color of a username through our hash function
-    const getUsernameColor = (username) => {
-        // Compute hash code
-        var hash = 7;
-        for (var i = 0; i < username.length; i++) {
-            hash = username.charCodeAt(i) + (hash << 5) - hash;
-        }
-        // Calculate color
-        var index = Math.abs(hash % COLORS.length);
-        return COLORS[index];
+    const createPlayerContainer = (playerId) => {
+        $watchingRootContainer.appendChild(`<div id="${playerId}container"></div>`);
+        $watchingContainers[playerId] = $(`#${playerId}container`);
+
+        return getPlayerContainerSimple(playerId);
     }
 
-    const updateGameState = (state) => {
-        $gameField[0].innerHTML = state.map(row => ([
-            '<div class="gameRow">',
-            row
-                .map(cell => (`<div class="gameCell ${cell === '.' ? '' : 'empty'}"></div>`))
-                .join(''),
-            '</div>',
-        ].join(''))).join('');
+    const getPlayerContainerSimple = (playerId) => {
+        return $watchingContainers[playerId];
     }
 
-    const updateNextItem = (item) => {
-        $gameNextItem[0].innerHTML = item.map(row => ([
-            '<div class="gameRow">',
-            row
-                .map(cell => (`<div class="gameCell ${cell === '.' ? '' : 'empty'}"></div>`))
-                .join(''),
-            '</div>',
-        ].join(''))).join('');
+    const getPlayerContainer = (playerId) => {
+        return getPlayerContainerSimple(playerId) || createPlayerContainer(playerId);
     }
 
-    const updateScore = (value) => {
-        $gameScore[0].innerText = value;
+    const updateOwnGameState = (state) => {
+        const view = getGameView($ownGameContainer);
+        view.setAttribute('state', state);
     }
 
-    const updateLvl = (value) => {
-        $gameLvl[0].innerText = value;
+    const updatePlayerGameState = (playerId, state) => {
+        const $playerContainer = getPlayerContainer(playerId);
+        const view = getGameView($playerContainer);
+        view.setAttribute('state', state);
     }
 
+    const updateOwnNextItem = (state) => {
+        const view = getGameView($ownGameContainer);
+        view.setAttribute('nextItem', state);
+    }
+
+    const updatePlayerNextItem = (playerId, state) => {
+        const $playerContainer = getPlayerContainer(playerId);
+        const view = getGameView($playerContainer);
+        view.setAttribute('nextItem', state);
+    }
+
+    const updateOwnScore = (value) => {
+        const view = getGameView($ownGameContainer);
+        view.setAttribute('score', value);
+    }
+
+    const updatePlayerScore = (playerId, value) => {
+        const $playerContainer = getPlayerContainer(playerId);
+        const view = getGameView($playerContainer);
+        view.setAttribute('score', value);
+    }
+
+    const updateOwnLevel = (value) => {
+        const view = getGameView($ownGameContainer);
+        view.setAttribute('level', value);
+    }
+
+    const updatePlayerLevel = (playerId, value) => {
+        const $playerContainer = getPlayerContainer(playerId);
+        const view = getGameView($playerContainer);
+        view.setAttribute('level', value);
+    }
+
+    // Keyboard events
     const gameKeys = [
         "ArrowLeft",
         "ArrowRight",
@@ -234,14 +163,12 @@ $(function() {
         ArrowDown: socket.emit.bind(socket, 'dropFigure'),
     });
 
-    // Keyboard events
     //key: "ArrowLeft", keyCode: 37
     //key: "ArrowRight", keyCode: 39
     //key: "ArrowUp", keyCode: 38
     //key: "ArrowDown", keyCode: 40
     $window.keydown(event => {
         if (gameKeys.includes(event.key)) {
-            $inputMessage.blur();
             event.preventDefault();
             event.stopImmediatePropagation();
 
@@ -249,24 +176,10 @@ $(function() {
 
             return;
         }
-        // Auto-focus the current input when a key is typed
-        if (username && !(event.ctrlKey || event.metaKey || event.altKey)) {
-            $inputMessage.focus();
-        }
         // When the client hits ENTER on their keyboard
-        if (event.which === 13) {
-            if (username) {
-                sendMessage();
-                socket.emit('stop typing');
-                typing = false;
-            } else {
-                setUsername();
-            }
+        if (event.which === 13 && !username) {
+            setUsername();
         }
-    });
-
-    $inputMessage.on('input', () => {
-        updateTyping();
     });
 
     // Click events
@@ -276,50 +189,48 @@ $(function() {
         $usernameInput.focus()
     });
 
-    // Focus input when clicking on the message input's border
-    $inputMessage.click(() => {
-        $inputMessage.focus();
-    });
+    $watchButton.click(() => {
+        socket.emit('startWatching');
+        isWatchingMode = true;
+        $gamePage.fadeOut();
+        $watchingPage.show();
+    })
+
+    $playButton.click(() => {
+        $watchingPage.fadeOut();
+        $gamePage.show();
+        socket.emit('startGame');
+        isWatchingMode = false;
+    })
 
     // Socket events
 
     // Whenever the server emits 'login', log the login message
     socket.on('login', (data) => {
-        connected = true;
-        // Display the welcome message
-        var message = "Welcome to Socket.IO Chat";
-        log(message, {prepend: true});
         addParticipantsMessage(data);
-        socket.emit('startGame');
+        socket.emit('startWatching');
+        isWatchingMode = true;
     });
 
     socket.on('newGameState', data => {
-        console.log('newGameState');
-        updateGameState(data.state);
+        console.log('newGameState', data.id);
+        isWatchingMode ? updatePlayerGameState(data.id, data.state) : updateOwnGameState(data.state);
     })
 
     socket.on('newNextItem', data => {
-        console.log('newNextItem');
-        updateNextItem(data.item);
+        console.log('newNextItem', data.id);
+        isWatchingMode ? updatePlayerNextItem(data.id, data.item) : updateOwnNextItem(data.item);
     })
 
     socket.on('newScore', data => {
-        console.log('newScore', data.value);
-        updateScore(data.value);
+        console.log('newScore', data.id, data.value);
+        isWatchingMode ? updatePlayerScore(data.id, data.value) : updateOwnScore(data.value);
     })
 
     socket.on('newLvl', data => {
-        console.log('newLvl', data.value);
-        updateLvl(data.value);
+        console.log('newLvl', data.id, data.value);
+        isWatchingMode ? updatePlayerLevel(data.id, data.value) : updateOwnLevel(data.value);
     })
-
-    // Whenever the server emits 'new message', update the chat body
-    socket.on('new message', (data) => {
-        log(`new message: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
-        if (data.username !== username){
-            addChatMessage(data);
-        }
-    });
 
     // Whenever the server emits 'user joined', log it in the chat body
     socket.on('user joined', (data) => {
@@ -334,23 +245,6 @@ $(function() {
     socket.on('user left', (data) => {
         log(data.username + ' left');
         addParticipantsMessage(data);
-        removeChatTyping(data);
-    });
-
-    // Whenever the server emits 'typing', show the typing message
-    socket.on('typing', (data) => {
-        log(`typing: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
-        if (data.username !== username){
-            addChatTyping(data);
-        }
-    });
-
-    // Whenever the server emits 'stop typing', kill the typing message
-    socket.on('stop typing', (data) => {
-        log(`stop typing: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
-        if (data.username !== username){
-            removeChatTyping(data);
-        }
     });
 
     socket.on('disconnect', () => {

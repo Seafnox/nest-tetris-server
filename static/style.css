@@ -50,11 +50,11 @@ ul {
 
 /* Login Page */
 
-.login.page {
+#loginPage {
   background-color: #000;
 }
 
-.login.page .form {
+#loginPage .form {
   height: 100px;
   margin-top: -100px;
   position: absolute;
@@ -64,7 +64,7 @@ ul {
   width: 100%;
 }
 
-.login.page .form .usernameInput {
+#usernameInput {
   background-color: transparent;
   border: none;
   border-bottom: 2px solid #fff;
@@ -72,77 +72,44 @@ ul {
   padding-bottom: 15px;
   text-align: center;
   width: 400px;
-}
-
-.login.page .title {
-  font-size: 2em;
-}
-
-.login.page .usernameInput {
   font-size: 2em;
   letter-spacing: 3px;
+  color: #fff;
+  font-weight: 100;
 }
 
-.login.page .title, .login.page .usernameInput {
+#loginPage .title {
+  font-size: 2em;
   color: #fff;
   font-weight: 100;
 }
 
 /* Game page */
 
-.game.page {
+#gamePage {
   display: none;
   background-color: #f0f0f0;
 }
 
-.gamePageContainer {
+.gamePageContent {
   height: 100%;
   display: grid;
   padding: 0 0 0 25px;
   grid-gap: 25px;
-  grid-template-columns: 2fr 3fr;
+  grid-template-columns: 3fr 3fr;
 }
 
-.chatSide {
+.logSide {
   border: 1px solid #666666;
   position: relative;
 }
 
-/* Fonts */
-
-.gameScore {
-  font-size: 5em;
-}
-
-.gameLvl {
-  font-size: 3em;
-}
-
-.messages {
-  font-size: 1em;
-}
-
-.inputMessage {
-  font-size: 1em;
-}
-
-.log {
-  font-size: .7em;
-}
-
-/* Messages */
-
-.chatArea {
-  height: 100%;
-  padding-bottom: 60px;
-  text-align: left;
-}
-
-.messages {
+#messages {
   height: 100%;
   margin: 0;
   overflow-y: scroll;
   padding: 10px 20px 10px 20px;
+  font-size: 1em;
 }
 
 .message.typing .messageBody {
@@ -152,6 +119,7 @@ ul {
 .message.log {
   color: gray;
   margin: 5px;
+  font-size: .7em;
 }
 
 .username {
@@ -161,62 +129,7 @@ ul {
   text-align: right;
 }
 
-/* Input */
-
-.inputMessage {
-  border: 10px solid #000;
-  bottom: 0;
-  height: 60px;
-  left: 0;
-  outline: none;
-  padding-left: 10px;
-  position: absolute;
-  right: 0;
-  width: 100%;
-}
-
-/* Game */
-
-.gameHeader {
-  display: flex;
-}
-
-.gameScore {
-  flex-grow: 4;
-}
-
-.gamelvl {
-  flex-grow: 2;
-}
-
-.gameSplitter {
-  display: flex;
-}
-
-.gameNextItem {
-  flex-grow: 1;
-  text-align: center;
-  word-spacing: 0;
-}
-
-.gameCell {
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
-  border: 4px solid #000;
-}
-
-.gameCell.empty {
-  border: 1px solid #666;
-}
-
-.gameRow {
-  display: flex;
-}
-
-.gameField {
-  border: 2px solid #000;
-  flex-grow: 3;
-  min-height: 200px;
-  text-align: left;
+/* Watching */
+#watchingPage {
+  background: #f0f0f0;
 }
