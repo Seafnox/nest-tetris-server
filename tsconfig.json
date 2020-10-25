@@ -12,7 +12,5 @@
     "baseUrl": "./",
     "incremental": true
   },
-  "exclude": [
-    "frontSrc"
-  ]
+  "exclude": []
 }

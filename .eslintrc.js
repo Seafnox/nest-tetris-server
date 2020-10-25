@@ -17,9 +17,11 @@ module.exports = {
     jest: true,
   },
   rules: {
-    '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/lines-between-class-members': 2,
+    '@typescript-eslint/no-unnecessary-type-assertion': 2,
+    '@typescript-eslint/prefer-nullish-coalescing': 2,
+    '@typescript-eslint/explicit-function-return-type': 2,
+    '@typescript-eslint/explicit-module-boundary-types': 2,
+    '@typescript-eslint/no-explicit-any': 2,
   },
 };

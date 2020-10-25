@@ -1,5 +1,6 @@
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { RecordLike } from '../../interfaces/record-like';
 import { GameService } from '../../services/game.service';
 import { XSocketClient } from '../../interfaces/x-socket-client';
 
@@ -15,7 +16,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('add user')
-  addUser(player: XSocketClient, payload: any): void {
+  addUser(player: XSocketClient, payload: unknown): void {
     player.name = payload.toString();
     console.log('addUser', player.id, player.name);
 
@@ -24,7 +25,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('startGame')
-  startGame(player: XSocketClient, payload: any): void {
+  startGame(player: XSocketClient, payload: unknown): void {
     console.log('startGame', player.id, player.name, JSON.stringify(payload));
     this.watchers = this.watchers.filter(watcherId => watcherId !== player.id);
 
@@ -32,7 +33,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('startWatching')
-  startWatching(player: XSocketClient, payload: any): void {
+  startWatching(player: XSocketClient, payload: unknown): void {
     console.log('startWatching', player.id, player.name, JSON.stringify(payload));
     this.gameService.stopPlayerGame(player.id);
 
@@ -40,7 +41,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('moveFigure')
-  moveFigure(player: XSocketClient, payload: any): void {
+  moveFigure(player: XSocketClient, payload: unknown): void {
     console.log('moveFigure', player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
       eventName: 'moveFigure',
@@ -50,7 +51,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('rotateFigure')
-  rotateFigure(player: XSocketClient, payload: any): void {
+  rotateFigure(player: XSocketClient, payload: unknown): void {
     console.log('rotateFigure', player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
       eventName: 'rotateFigure',
@@ -60,7 +61,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('dropFigure')
-  dropFigure(player: XSocketClient, payload: any): void {
+  dropFigure(player: XSocketClient, payload: unknown): void {
     console.log('dropFigure', player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
       eventName: 'dropFigure',
@@ -69,11 +70,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  public handleConnection(player: XSocketClient, ...args: any[]): any {
+  public handleConnection<T>(player: XSocketClient, ...args: T[]): void {
     console.log('connected', player.id, player.name, args);
   }
 
-  public handleDisconnect(player: XSocketClient): any {
+  public handleDisconnect(player: XSocketClient): void {
     console.log('disconnected', player.id, player.name);
 
     this.watchers = this.watchers.filter(watcherId => watcherId !== player.id);
@@ -86,7 +87,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return Object.keys(this.server.clients().connected).length;
   }
 
-  private broadcastFromPlayer(player: XSocketClient, eventName: string, data: object = {}): void {
+  private broadcastFromPlayer(player: XSocketClient, eventName: string, data: RecordLike = {}): void {
     this.broadcast(eventName, {
       id: player.id,
       name: player.name,
@@ -94,11 +95,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     })
   }
 
-  private broadcast(eventName: string, data: object = {}): void {
+  private broadcast(eventName: string, data: RecordLike = {}): void {
     this.server.emit(eventName, data);
   }
 
-  private emit(playerId: string, eventName: string, data: object = {}): void {
+  private emit(playerId: string, eventName: string, data: RecordLike = {}): void {
     const targetIds = [playerId, ...this.watchers];
     const player: XSocketClient = this.server.clients().connected[playerId];
 
@@ -109,7 +110,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     })
   }
 
-  private emitToWatcher(watcher: XSocketClient, player: XSocketClient, eventName: string, data: object = {}): void {
+  private emitToWatcher(watcher: XSocketClient, player: XSocketClient, eventName: string, data: RecordLike = {}): void {
     watcher.emit( eventName, {
       id: player.id,
       username: player.name,

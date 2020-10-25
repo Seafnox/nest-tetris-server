@@ -3,10 +3,12 @@ import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { Direction } from '../game/direction';
 import { Game } from '../game/game';
 import { GameBridgeEvent } from '../interfaces/game-bridge-event';
+import { RecordLike } from '../interfaces/record-like';
 
 @Injectable()
 export class GameService {
     private subscriptions: Record<string, Subscription> = {};
+
     private games: Record<string, Game> = {};
 
     private emitter$ = new Subject<GameBridgeEvent>();
@@ -16,7 +18,7 @@ export class GameService {
     }
 
     public userAction(event: GameBridgeEvent): void {
-        const userActionMap: Record<string, (playerId: string, data: object) => void> = {
+        const userActionMap: Record<string, (playerId: string, data: RecordLike) => void> = {
             moveFigure: this.onMoveFigure.bind(this),
             rotateFigure: this.onRotateFigure.bind(this),
             dropFigure: this.onDropFigure.bind(this),
@@ -110,7 +112,7 @@ export class GameService {
         }
     }
 
-    private emit(playerId: string, eventName: string, data: object): void {
+    private emit(playerId: string, eventName: string, data: RecordLike): void {
         this.emitter$.next({ playerId, eventName, data });
     }
 

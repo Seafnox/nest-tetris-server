@@ -10,10 +10,13 @@ import { GameConst } from '../game.constants';
 
 export abstract class Figure {
     public isRotatable = this.getViews().length !== 1;
+
     public currentView = 0;
 
     public posX = GameConst.rowsCount + this.getInitialOffset();
+
     public posY = Math.round(GameConst.colsCount / 2);
+
     public name = this.constructor.name;
 
     public abstract getViews(): GameState[];

@@ -15,14 +15,23 @@ import { GameConst } from './game.constants';
 
 export class Game {
     public gameState: GameState;
+
     public currentFigure: Figure;
+
     public nextFigure: Figure;
+
     public isGameOver: boolean;
+
     public isScoreIncremented: boolean;
+
     public isLvlUp: boolean;
+
     public isFigureFall: boolean;
+
     public score: number;
+
     public level: number;
+
     private nextLevelScore: number;
 
     private availableFigures: Type<Figure>[] = [
