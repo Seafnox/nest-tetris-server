@@ -9,7 +9,7 @@ import { GameService } from './services/game.service';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'static'),
+      rootPath: join(__dirname, '..', '..', 'static'),
     }),
   ],
   controllers: [AppController],
