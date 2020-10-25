@@ -15,6 +15,26 @@ let GameWrapper = class GameWrapper extends LitElement {
     }
     render() {
         return html `
+            <style>
+        :host {
+            display: block;
+            border: 1px solid #909090;
+            padding: 5px;
+        }
+
+        .header {
+            display: grid;
+            grid-gap: 25px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .content {
+            display: grid;
+            grid-gap: 25px;
+            grid-template-columns: 10fr 4fr;
+        }
+            </style>
+
             <div class="header">
                 <game-score .score="${this.score}"></game-score>
                 <game-level .level="${this.level}"></game-level>
@@ -26,25 +46,6 @@ let GameWrapper = class GameWrapper extends LitElement {
         `;
     }
 };
-GameWrapper.styles = css `
-        :host {
-            display: block;
-            border: 1px solid #909090;
-            padding: 5px;
-        }
-
-        .header {
-            display: flex;
-            grid-gap: 25px;
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .content {
-            display: grid;
-            grid-gap: 25px;
-            grid-template-columns: 10fr 4fr;
-        }
-    `;
 __decorate([
     property()
 ], GameWrapper.prototype, "state", void 0);
