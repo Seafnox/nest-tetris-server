@@ -76,6 +76,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   public handleDisconnect(player: XSocketClient): any {
     console.log('disconnected', player.id, player.name);
 
+    this.watchers = this.watchers.filter(watcherId => watcherId !== player.id);
     this.gameService.stopPlayerGame(player.id);
 
     this.broadcastFromPlayer(player,'user left', { numUsers: this.getConnectedClientCount() });
