@@ -76,7 +76,7 @@ $(function() {
     const cleanInput = (input) => $('<div/>').text(input).html();
 
     const createGameView = ($parent) => {
-        $parent[0].innerHtml = `<game-wrapper></game-wrapper>`;
+        $parent[0].innerHTML = `<game-wrapper></game-wrapper>`;
 
         return getGameViewSimple($parent);
     }
@@ -90,7 +90,7 @@ $(function() {
     }
 
     const createPlayerContainer = (playerId) => {
-        $watchingRootContainer.appendChild(`<div id="${playerId}container"></div>`);
+        $watchingRootContainer[0].innerHTML = `${$watchingRootContainer[0].innerHTML}<div id="${playerId}container"></div>`;
         $watchingContainers[playerId] = $(`#${playerId}container`);
 
         return getPlayerContainerSimple(playerId);
@@ -106,46 +106,64 @@ $(function() {
 
     const updateOwnGameState = (state) => {
         const view = getGameView($ownGameContainer);
-        view.setAttribute('state', state);
+        view.state = JSON.stringify(state);
     }
 
     const updatePlayerGameState = (playerId, state) => {
         const $playerContainer = getPlayerContainer(playerId);
         const view = getGameView($playerContainer);
-        view.setAttribute('state', state);
+        view.state = JSON.stringify(state);
     }
 
     const updateOwnNextItem = (state) => {
         const view = getGameView($ownGameContainer);
-        view.setAttribute('nextItem', state);
+        view.nextItem = JSON.stringify(state);
     }
 
     const updatePlayerNextItem = (playerId, state) => {
         const $playerContainer = getPlayerContainer(playerId);
         const view = getGameView($playerContainer);
-        view.setAttribute('nextItem', state);
+        view.nextItem = JSON.stringify(state);
     }
 
     const updateOwnScore = (value) => {
         const view = getGameView($ownGameContainer);
-        view.setAttribute('score', value);
+        view.score = value;
     }
 
     const updatePlayerScore = (playerId, value) => {
         const $playerContainer = getPlayerContainer(playerId);
         const view = getGameView($playerContainer);
-        view.setAttribute('score', value);
+        view.score = value;
     }
 
     const updateOwnLevel = (value) => {
         const view = getGameView($ownGameContainer);
-        view.setAttribute('level', value);
+        view.level = value;
     }
 
     const updatePlayerLevel = (playerId, value) => {
         const $playerContainer = getPlayerContainer(playerId);
         const view = getGameView($playerContainer);
-        view.setAttribute('level', value);
+        view.level = value;
+    }
+
+    const startWatching = (emitting) => {
+        if (emitting) {
+            socket.emit('startWatching');
+        }
+        isWatchingMode = true;
+        $gamePage.fadeOut();
+        $watchingPage.show();
+    }
+
+    const startPlaying = (emitting) => {
+        $watchingPage.fadeOut();
+        $gamePage.show();
+        if (emitting) {
+            socket.emit('startGame');
+        }
+        isWatchingMode = false;
     }
 
     // Keyboard events
@@ -189,19 +207,9 @@ $(function() {
         $usernameInput.focus()
     });
 
-    $watchButton.click(() => {
-        socket.emit('startWatching');
-        isWatchingMode = true;
-        $gamePage.fadeOut();
-        $watchingPage.show();
-    })
+    $watchButton.click(() => startWatching(true))
 
-    $playButton.click(() => {
-        $watchingPage.fadeOut();
-        $gamePage.show();
-        socket.emit('startGame');
-        isWatchingMode = false;
-    })
+    $playButton.click(() => startPlaying(true))
 
     // Socket events
 
@@ -213,7 +221,7 @@ $(function() {
     });
 
     socket.on('newGameState', data => {
-        console.log('newGameState', data.id);
+        console.log('newGameState', data.id, data.state);
         isWatchingMode ? updatePlayerGameState(data.id, data.state) : updateOwnGameState(data.state);
     })
 
@@ -249,11 +257,13 @@ $(function() {
 
     socket.on('disconnect', () => {
         log('you have been disconnected');
+        startWatching();
     });
 
     socket.on('reconnect', () => {
         log('you have been reconnected');
         if (username) {
+            startWatching();
             socket.emit('add user', username);
         }
     });
