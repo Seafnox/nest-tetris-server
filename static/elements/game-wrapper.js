@@ -4,7 +4,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { LitElement, html, customElement, property, css } from './lit-element.js';
+import { LitElement, html, customElement, property, css } from 'https://unpkg.com/lit-element?module';
 let GameWrapper = class GameWrapper extends LitElement {
     constructor() {
         super(...arguments);
@@ -16,12 +16,12 @@ let GameWrapper = class GameWrapper extends LitElement {
     render() {
         return html `
             <div class="header">
-                <game-score score="${this.score}"></game-score>
-                <game-level level="${this.level}"></game-level>
+                <game-score .score="${this.score}"></game-score>
+                <game-level .level="${this.level}"></game-level>
             </div>
             <div class="content">
-                <game-field state="${this.state}"></game-field>
-                <game-field class="next-item" state="${this.nextItem}"></game-field>
+                <game-field .state="${this.state}"></game-field>
+                <game-field class="next-item" .state="${this.nextItem}"></game-field>
             </div>
         `;
     }
@@ -30,14 +30,15 @@ GameWrapper.styles = css `
         :host {
             display: block;
             border: 1px solid #909090;
+            padding: 5px;
         }
-        
+
         .header {
-            display: grid;
+            display: flex;
             grid-gap: 25px;
             grid-template-columns: 1fr 1fr;
         }
-        
+
         .content {
             display: grid;
             grid-gap: 25px;
