@@ -20,7 +20,8 @@ $(function() {
     var username;
     $usernameInput.val(`test-${Math.floor(Math.random()*1000)}`);
 
-    var socket = io();
+    var socketApi = new SocketApi();
+    socketApi.init();
 
     const addParticipantsMessage = (data) => {
         var message = '';
@@ -43,7 +44,7 @@ $(function() {
             $loginPage.off('click');
 
             // Tell the server your username
-            socket.emit('add user', username);
+            socketApi.addUser(username);
         }
     }
 
@@ -150,7 +151,7 @@ $(function() {
 
     const startWatching = (emitting) => {
         if (emitting) {
-            socket.emit('startWatching');
+            socketApi.startWatching();
         }
         isWatchingMode = true;
         $gamePage.fadeOut();
@@ -161,7 +162,7 @@ $(function() {
         $watchingPage.fadeOut();
         $gamePage.show();
         if (emitting) {
-            socket.emit('startGame');
+            socketApi.startPlaying();
         }
         isWatchingMode = false;
     }
@@ -174,11 +175,11 @@ $(function() {
         "ArrowDown",
     ];
 
-    const gameActions = (socket) => ({
-        ArrowLeft: socket.emit.bind(socket, 'moveFigure', 'left'),
-        ArrowRight: socket.emit.bind(socket, 'moveFigure', 'right'),
-        ArrowUp: socket.emit.bind(socket, 'rotateFigure', 'right'),
-        ArrowDown: socket.emit.bind(socket, 'dropFigure'),
+    const gameActions = (socketApi) => ({
+        ArrowLeft: socketApi.moveFigure.bind(socketApi, 'left'),
+        ArrowRight: socketApi.moveFigure.bind(socketApi, 'right'),
+        ArrowUp: socketApi.rotateFigure.bind(socketApi, 'right'),
+        ArrowDown: socketApi.dropFigure.bind(socketApi),
     });
 
     //key: "ArrowLeft", keyCode: 37
@@ -190,7 +191,7 @@ $(function() {
             event.preventDefault();
             event.stopImmediatePropagation();
 
-            gameActions(socket)[event.key]();
+            gameActions(socketApi)[event.key]();
 
             return;
         }
@@ -214,34 +215,30 @@ $(function() {
     // Socket events
 
     // Whenever the server emits 'login', log the login message
-    socket.on('login', (data) => {
+    socketApi.onLoginSuccess((data) => {
         addParticipantsMessage(data);
-        socket.emit('startWatching');
+        socketApi.startWatching();
         isWatchingMode = true;
     });
 
-    socket.on('newGameState', data => {
-        console.log('newGameState', data.id, data.state);
+    socketApi.onUpdateGameState(data => {
         isWatchingMode ? updatePlayerGameState(data.id, data.state) : updateOwnGameState(data.state);
     })
 
-    socket.on('newNextItem', data => {
-        console.log('newNextItem', data.id);
+    socketApi.onUpdateNextItem(data => {
         isWatchingMode ? updatePlayerNextItem(data.id, data.item) : updateOwnNextItem(data.item);
     })
 
-    socket.on('newScore', data => {
-        console.log('newScore', data.id, data.value);
+    socketApi.onUpdateScore(data => {
         isWatchingMode ? updatePlayerScore(data.id, data.value) : updateOwnScore(data.value);
     })
 
-    socket.on('newLvl', data => {
-        console.log('newLvl', data.id, data.value);
+    socketApi.onUpdateLevel(data => {
         isWatchingMode ? updatePlayerLevel(data.id, data.value) : updateOwnLevel(data.value);
     })
 
     // Whenever the server emits 'user joined', log it in the chat body
-    socket.on('user joined', (data) => {
+    socketApi.onAddUser((data) => {
         log(`user joined: '${JSON.stringify(data)}', isMe: ${data.username === username}`)
         if (data.username !== username){
             log(data.username + ' joined');
@@ -250,25 +247,25 @@ $(function() {
     });
 
     // Whenever the server emits 'user left', log it in the chat body
-    socket.on('user left', (data) => {
+    socketApi.onRemoveUser((data) => {
         log(data.username + ' left');
         addParticipantsMessage(data);
     });
 
-    socket.on('disconnect', () => {
+    socketApi.onDisconnect(() => {
         log('you have been disconnected');
         startWatching();
     });
 
-    socket.on('reconnect', () => {
+    socketApi.onReconnectSuccess(() => {
         log('you have been reconnected');
         if (username) {
             startWatching();
-            socket.emit('add user', username);
+            socketApi.addUser(username);
         }
     });
 
-    socket.on('reconnect_error', () => {
+    socketApi.onReconnectFail(() => {
         log('attempt to reconnect has failed');
     });
 
