@@ -16,12 +16,12 @@ export class GameWrapper {
     return (
       <Host>
         <div class="header">
-          <game-score score="${this.score}"></game-score>
-          <game-level level="${this.level}"></game-level>
+          <game-score score={this.score}></game-score>
+          <game-level level={this.level}></game-level>
         </div>
         <div class="content">
-          <game-field state="${this.state}"></game-field>
-          <game-field class="next-item" state="${this.nextItem}"></game-field>
+          <game-field state={this.state}></game-field>
+          <game-field class="next-item" state={this.nextItem}></game-field>
         </div>
       </Host>
     );

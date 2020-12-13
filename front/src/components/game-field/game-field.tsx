@@ -1,4 +1,4 @@
-import { Component, Prop } from '@stencil/core';
+import { Component, Host, h, Prop } from '@stencil/core';
 import { GameStateDto } from '../../../../dto/game-state-dto';
 import { CellDto } from '../../../../dto/cell-dto';
 
@@ -12,14 +12,19 @@ export class GameField {
 
   render(): string {
     if (!this.state) {
-      return ``;
+      return (<Host></Host>);
     }
 
-    return this.state.map(row => {
-      return `<div class="row">${row.map(cell => {
-        return `<div class="cell ${cell === CellDto.EMPTY ? 'empty' : ''}"></div>`;
-      })}</div>`;
-    }).join('');
+    return (<Host>
+      {this.state.map(row => {
+        return (<div class="row">{row.map(cell => {
+          return (<div class={{
+            cell: true,
+            empty: cell === CellDto.EMPTY
+          }}></div>);
+        })}</div>);
+      })}
+    </Host>);
   }
 
 }

@@ -12,6 +12,7 @@
   height: 40px;
   line-height: 40px;
   border: 4px solid #909090;
+  box-sizing: border-box;
 }
 
 .cell.empty {
