@@ -12,7 +12,8 @@
     "g": "stencil generate"
   },
   "devDependencies": {
-    "@stencil/core": "^2.0.0"
+    "@stencil/core": "^2.0.0",
+    "workbox-build": "^6.0.2"
   },
   "license": "MIT"
 }

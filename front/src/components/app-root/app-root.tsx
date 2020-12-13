@@ -13,7 +13,7 @@ export class AppRoot {
   @State() nextItem: GameStateDto = [[]];
   @State() game: GameStateDto = [[]];
 
-  timer: number;
+  timer;
 
   checkNewState(): void {
     clearTimeout(this.timer);

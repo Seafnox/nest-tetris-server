@@ -11,6 +11,8 @@
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2017",
+    "rootDir": "../",
+    "baseUrl": "./",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",
