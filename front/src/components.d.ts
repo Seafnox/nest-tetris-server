@@ -5,8 +5,24 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { GameStateDto } from "../../dto/game-state-dto";
 export namespace Components {
     interface AppRoot {
+    }
+    interface GameField {
+        "state": GameStateDto;
+    }
+    interface GameLevel {
+        "level": number;
+    }
+    interface GameScore {
+        "score": number;
+    }
+    interface GameWrapper {
+        "level": number;
+        "nextItem": GameStateDto;
+        "score": number;
+        "state": GameStateDto;
     }
 }
 declare global {
@@ -16,15 +32,62 @@ declare global {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
     };
+    interface HTMLGameFieldElement extends Components.GameField, HTMLStencilElement {
+    }
+    var HTMLGameFieldElement: {
+        prototype: HTMLGameFieldElement;
+        new (): HTMLGameFieldElement;
+    };
+    interface HTMLGameLevelElement extends Components.GameLevel, HTMLStencilElement {
+    }
+    var HTMLGameLevelElement: {
+        prototype: HTMLGameLevelElement;
+        new (): HTMLGameLevelElement;
+    };
+    interface HTMLGameScoreElement extends Components.GameScore, HTMLStencilElement {
+    }
+    var HTMLGameScoreElement: {
+        prototype: HTMLGameScoreElement;
+        new (): HTMLGameScoreElement;
+    };
+    interface HTMLGameWrapperElement extends Components.GameWrapper, HTMLStencilElement {
+    }
+    var HTMLGameWrapperElement: {
+        prototype: HTMLGameWrapperElement;
+        new (): HTMLGameWrapperElement;
+    };
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
+        "game-field": HTMLGameFieldElement;
+        "game-level": HTMLGameLevelElement;
+        "game-score": HTMLGameScoreElement;
+        "game-wrapper": HTMLGameWrapperElement;
     }
 }
 declare namespace LocalJSX {
     interface AppRoot {
     }
+    interface GameField {
+        "state"?: GameStateDto;
+    }
+    interface GameLevel {
+        "level"?: number;
+    }
+    interface GameScore {
+        "score"?: number;
+    }
+    interface GameWrapper {
+        "level"?: number;
+        "nextItem"?: GameStateDto;
+        "score"?: number;
+        "state"?: GameStateDto;
+    }
     interface IntrinsicElements {
         "app-root": AppRoot;
+        "game-field": GameField;
+        "game-level": GameLevel;
+        "game-score": GameScore;
+        "game-wrapper": GameWrapper;
     }
 }
 export { LocalJSX as JSX };
@@ -32,6 +95,10 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+            "game-field": LocalJSX.GameField & JSXBase.HTMLAttributes<HTMLGameFieldElement>;
+            "game-level": LocalJSX.GameLevel & JSXBase.HTMLAttributes<HTMLGameLevelElement>;
+            "game-score": LocalJSX.GameScore & JSXBase.HTMLAttributes<HTMLGameScoreElement>;
+            "game-wrapper": LocalJSX.GameWrapper & JSXBase.HTMLAttributes<HTMLGameWrapperElement>;
         }
     }
 }
