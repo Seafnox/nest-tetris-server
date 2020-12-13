@@ -1,4 +1,5 @@
 import { Type } from '@nestjs/common';
+import { GameStateDto } from '../../../dto/game-state-dto';
 import { GameState } from '../interfaces/game-state';
 import { CellState } from './cell-state';
 import { Direction } from './direction';
@@ -83,7 +84,7 @@ export class Game {
         this.currentFigure.dropInState(this.gameState);
     }
 
-    public getStateView(): string[][] {
+    public getStateView(): GameStateDto {
         return this.currentFigure.mapToState(this.gameState).map(row => row.map(cell => gameViewMap[cell])).reverse();
     }
 
