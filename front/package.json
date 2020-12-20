@@ -13,7 +13,11 @@
   },
   "devDependencies": {
     "@stencil/core": "^2.0.0",
+    "@types/socket.io-client": "^1.4.34",
     "workbox-build": "^6.0.2"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "socket.io-client": "^3.0.4"
+  }
 }

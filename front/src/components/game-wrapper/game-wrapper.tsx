@@ -1,5 +1,5 @@
 import { Component, Host, h, Prop } from '@stencil/core';
-import { GameStateDto } from '../../../../dto/game-state-dto';
+import { GameStateDto } from '~tetris/dto/game-state-dto';
 
 @Component({
   tag: 'game-wrapper',

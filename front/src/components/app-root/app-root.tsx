@@ -1,6 +1,6 @@
 import { Component, h, State } from '@stencil/core';
-import { GameStateDto } from '../../../../dto/game-state-dto';
-import { CellDto } from '../../../../dto/cell-dto';
+import { GameStateDto } from '~tetris/dto/game-state-dto';
+import { CellDto } from '~tetris/dto/cell-dto';
 
 @Component({
   tag: 'app-root',
@@ -13,7 +13,7 @@ export class AppRoot {
   @State() nextItem: GameStateDto = [[]];
   @State() game: GameStateDto = [[]];
 
-  timer;
+  private timer: NodeJS.Timer;
 
   checkNewState(): void {
     clearTimeout(this.timer);

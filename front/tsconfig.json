@@ -13,7 +13,11 @@
     "target": "es2017",
     "rootDir": "../",
     "baseUrl": "./",
-    "noUnusedLocals": true,
+    "paths": {
+      "~tetris/dto/*": "../dto/*",
+      "~tetris/back/*": "../back/src/*",
+      "~tetris/front/*": "../front/src/*"
+    },    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",
     "jsxFactory": "h"

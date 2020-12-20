@@ -1,6 +1,6 @@
 import { Component, Host, h, Prop } from '@stencil/core';
-import { GameStateDto } from '../../../../dto/game-state-dto';
-import { CellDto } from '../../../../dto/cell-dto';
+import { GameStateDto } from '~tetris/dto/game-state-dto';
+import { CellDto } from '~tetris/dto/cell-dto';
 
 @Component({
   tag: 'game-field',
