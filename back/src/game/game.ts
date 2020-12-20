@@ -1,5 +1,5 @@
 import { Type } from '@nestjs/common';
-import { GameStateDto } from '../../../dto/game-state-dto';
+import { GameStateDto } from '~tetris/dto/game-state-dto';
 import { GameState } from '../interfaces/game-state';
 import { CellState } from './cell-state';
 import { Direction } from './direction';

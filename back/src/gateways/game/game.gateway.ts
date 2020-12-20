@@ -1,5 +1,6 @@
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { SocketEventDto } from '~tetris/dto/socket-event-dto';
 import { RecordLike } from '../../interfaces/record-like';
 import { GameService } from '../../services/game.service';
 import { XSocketClient } from '../../interfaces/x-socket-client';
@@ -15,72 +16,72 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameService.emit$().subscribe(event => this.emit(event.playerId, event.eventName, event.data));
   }
 
-  @SubscribeMessage('add user')
+  @SubscribeMessage(SocketEventDto.RegisterUser)
   addUser(player: XSocketClient, payload: unknown): void {
     player.name = payload.toString();
-    console.log('addUser', player.id, player.name);
+    console.log(SocketEventDto.RegisterUser, player.id, player.name);
 
-    this.broadcastFromPlayer(player, 'user joined', { numUsers: this.getConnectedClientCount() });
-    this.emitToWatcher(player, player, 'login', { numUsers: this.getConnectedClientCount() });
+    this.broadcastFromPlayer(player, SocketEventDto.AddUser, { numUsers: this.getConnectedClientCount() });
+    this.emitToWatcher(player, player, SocketEventDto.UserLoginSuccess, { numUsers: this.getConnectedClientCount() });
   }
 
-  @SubscribeMessage('startGame')
+  @SubscribeMessage(SocketEventDto.StartNewGame)
   startGame(player: XSocketClient, payload: unknown): void {
-    console.log('startGame', player.id, player.name, JSON.stringify(payload));
+    console.log(SocketEventDto.StartNewGame, player.id, player.name, JSON.stringify(payload));
     this.watchers = this.watchers.filter(watcherId => watcherId !== player.id);
 
     this.gameService.startPlayerGame(player.id);
   }
 
-  @SubscribeMessage('startWatching')
+  @SubscribeMessage(SocketEventDto.StartWatchingMode)
   startWatching(player: XSocketClient, payload: unknown): void {
-    console.log('startWatching', player.id, player.name, JSON.stringify(payload));
+    console.log(SocketEventDto.StartWatchingMode, player.id, player.name, JSON.stringify(payload));
     this.gameService.stopPlayerGame(player.id);
 
     this.watchers = [player.id, ...this.watchers];
   }
 
-  @SubscribeMessage('moveFigure')
+  @SubscribeMessage(SocketEventDto.MoveFigure)
   moveFigure(player: XSocketClient, payload: unknown): void {
-    console.log('moveFigure', player.id, player.name, JSON.stringify(payload));
+    console.log(SocketEventDto.MoveFigure, player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
-      eventName: 'moveFigure',
+      eventName: SocketEventDto.MoveFigure,
       data: {payload},
       playerId: player.id,
     });
   }
 
-  @SubscribeMessage('rotateFigure')
+  @SubscribeMessage(SocketEventDto.RotateFigure)
   rotateFigure(player: XSocketClient, payload: unknown): void {
-    console.log('rotateFigure', player.id, player.name, JSON.stringify(payload));
+    console.log(SocketEventDto.RotateFigure, player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
-      eventName: 'rotateFigure',
+      eventName: SocketEventDto.RotateFigure,
       data: {payload},
       playerId: player.id,
     });
   }
 
-  @SubscribeMessage('dropFigure')
+  @SubscribeMessage(SocketEventDto.DropFigure)
   dropFigure(player: XSocketClient, payload: unknown): void {
-    console.log('dropFigure', player.id, player.name, JSON.stringify(payload));
+    console.log(SocketEventDto.DropFigure, player.id, player.name, JSON.stringify(payload));
     this.gameService.userAction({
-      eventName: 'dropFigure',
+      eventName: SocketEventDto.DropFigure,
       data: {payload},
       playerId: player.id,
     });
   }
 
   public handleConnection<T>(player: XSocketClient, ...args: T[]): void {
-    console.log('connected', player.id, player.name, args);
+    console.log(SocketEventDto.Connect, player.id, player.name, args);
   }
 
   public handleDisconnect(player: XSocketClient): void {
-    console.log('disconnected', player.id, player.name);
+    console.log(SocketEventDto.Disconnect, player.id, player.name);
 
     this.watchers = this.watchers.filter(watcherId => watcherId !== player.id);
     this.gameService.stopPlayerGame(player.id);
 
-    this.broadcastFromPlayer(player,'user left', { numUsers: this.getConnectedClientCount() });
+    this.broadcastFromPlayer(player, SocketEventDto.RemoveUser, { numUsers: this.getConnectedClientCount() });
   }
 
   private getConnectedClientCount(): number {

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
+import { DirectionDto } from '~tetris/dto/direction-dto';
 import { Direction } from '../game/direction';
 import { Game } from '../game/game';
 import { GameBridgeEvent } from '../interfaces/game-bridge-event';
@@ -74,10 +75,10 @@ export class GameService {
 
     private getDirection(directionStr: string): Direction {
         switch (directionStr) {
-            case 'left': return Direction.LEFT;
-            case 'right': return Direction.RIGHT;
-            case 'down': return Direction.DOWN;
-            default: throw new Error(`Unknwn direction: ${directionStr}`);
+            case DirectionDto.LEFT: return Direction.LEFT;
+            case DirectionDto.RIGHT: return Direction.RIGHT;
+            case DirectionDto.DOWN: return Direction.DOWN;
+            default: throw new Error(`Unknown direction: ${directionStr}`);
         }
     }
 

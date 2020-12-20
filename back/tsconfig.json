@@ -11,6 +11,11 @@
     "outDir": "./dist",
     "rootDir": "../",
     "baseUrl": "./",
+    "paths": {
+      "~tetris/dto/*": "../dto/*",
+      "~tetris/back/*": "../back/src/*",
+      "~tetris/front/*": "../front/src/*"
+    },
     "incremental": true
   },
   "exclude": []

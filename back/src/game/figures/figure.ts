@@ -5,7 +5,7 @@ import { GameState } from '../../interfaces/game-state';
 import { PointerPositionConfig } from '../../interfaces/pointer-position-config';
 import { CellState } from '../cell-state';
 import { Direction } from '../direction';
-import { GameStateDto } from '../../../../dto/game-state-dto';
+import { GameStateDto } from '~tetris/dto/game-state-dto';
 import { gameViewMap } from '../game-view-map';
 import { GameConst } from '../game.constants';
 

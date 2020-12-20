@@ -1,4 +1,4 @@
-import { CellDto } from '../../../dto/cell-dto';
+import { CellDto } from '~tetris/dto/cell-dto';
 import { CellState } from './cell-state';
 
 export const gameViewMap: Record<CellState, CellDto> = {
