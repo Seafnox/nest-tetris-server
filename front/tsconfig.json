@@ -16,7 +16,6 @@
     "paths": {
       "~tetris/dto/*": "../dto/*",
       "~tetris/back/*": "../back/src/*",
-      "~tetris/front/*": "../front/src/*"
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,
