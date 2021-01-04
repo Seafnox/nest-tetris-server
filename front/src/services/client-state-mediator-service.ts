@@ -1,4 +1,5 @@
 import { ClientState } from '../enums/client-state';
+import { getStateAtom, StateAtom } from './get-state-atom';
 import { ClientPlayController } from './state-controllers/client-play-controller';
 import { ClientSignController } from './state-controllers/client-sign-controller';
 import { ClientStateController } from './state-controllers/client-state-controller';
@@ -7,7 +8,9 @@ import { ClientWatchController } from './state-controllers/client-watch-controll
 import { InjectorService } from './Injector-factory';
 
 export class ClientStateMediatorService {
-  private _activeState: ClientState = ClientState.None;
+  public onStateChange: (cb: (state: ClientState) => void) => void;
+
+  private state: StateAtom<ClientState>;
 
   private availableStates: Record<ClientState, ClientState[]> = {
     [ClientState.None]: [ClientState.Signing],
@@ -27,15 +30,15 @@ export class ClientStateMediatorService {
     [ClientState.Watching]: ClientWatchController,
   }
 
-  constructor(private injector: InjectorService) {}
+  constructor(private injector: InjectorService) {
+    this.state = getStateAtom<ClientState>(ClientState.None);
+    this.onStateChange = this.state.onStateChange;
 
-  public set activeState(clientState: ClientState) {
-    this._activeState = clientState;
-    this.stateChanged(clientState);
+    this.state.onStateChange(state => this.stateChanged(state));
   }
 
   public get activeState(): ClientState {
-    return this._activeState;
+    return this.state.getState();
   }
 
   public switchState(clientState: ClientState): void {
@@ -43,10 +46,10 @@ export class ClientStateMediatorService {
       throw new Error(`Switching state from '${this.activeState}' to '${clientState}' is not valid!`);
     }
 
-    this.activeState = clientState;
+    this.state.setState(clientState);
   }
 
-  public stateChanged(clientState: ClientState): void {
+  private stateChanged(clientState: ClientState): void {
     if (this._activeController) {
       this._activeController.stop();
     }
