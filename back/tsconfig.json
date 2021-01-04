@@ -12,9 +12,7 @@
     "rootDir": "../",
     "baseUrl": "./",
     "paths": {
-      "~tetris/dto/*": "../dto/*",
-      "~tetris/back/*": "../back/src/*",
-      "~tetris/front/*": "../front/src/*"
+      "~tetris/dto/*": ["../dto/*"],
     },
     "incremental": true
   },
