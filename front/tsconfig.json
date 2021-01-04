@@ -14,8 +14,7 @@
     "rootDir": "../",
     "baseUrl": "./",
     "paths": {
-      "~tetris/dto/*": "../dto/*",
-      "~tetris/back/*": "../back/src/*",
+      "~tetris/dto/*": ["../dto/*"],
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,
