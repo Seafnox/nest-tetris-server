@@ -1,11 +1,11 @@
 import { ClientState } from '../enums/client-state';
 import { getStateAtom, StateAtom } from './get-state-atom';
+import { InjectorService } from './Injector-factory';
 import { ClientPlayController } from './state-controllers/client-play-controller';
 import { ClientSignController } from './state-controllers/client-sign-controller';
 import { ClientStateController } from './state-controllers/client-state-controller';
 import { ClientSwitchController } from './state-controllers/client-switch-controller';
 import { ClientWatchController } from './state-controllers/client-watch-controller';
-import { InjectorService } from './Injector-factory';
 
 export class ClientStateMediatorService {
   public onStateChange: (cb: (state: ClientState) => void) => void;
@@ -52,6 +52,10 @@ export class ClientStateMediatorService {
   private stateChanged(clientState: ClientState): void {
     if (this._activeController) {
       this._activeController.stop();
+    }
+
+    if (clientState === ClientState.None) {
+      return;
     }
 
     this._activeController = this.injector.inject(this.controllerByTypes[clientState]);
