@@ -1,10 +1,16 @@
-export function getStateAtom<T>(initialState?: T) {
-  type StateChangeHandler = (state: T) => void;
+export interface StateAtom<Atom> {
+  setState(newState: Atom): void;
+  onStateChange(cb: (state: Atom) => void): void;
+  getState(): Atom;
+}
 
-  let state: T = initialState;
+export function getStateAtom<Atom>(initialState?: Atom): StateAtom<Atom> {
+  type StateChangeHandler = (state: Atom) => void;
+
+  let state: Atom = initialState;
   const handlers: StateChangeHandler[] = [];
 
-  const setState = (newState: T): void => {
+  const setState = (newState: Atom): void => {
     state = newState;
 
     handlers.forEach(cb => cb(state));
@@ -16,7 +22,7 @@ export function getStateAtom<T>(initialState?: T) {
     cb(state);
   }
 
-  const getState = (): T => state;
+  const getState = (): Atom => state;
 
   return {
     setState,
