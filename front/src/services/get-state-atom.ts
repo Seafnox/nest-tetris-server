@@ -13,7 +13,7 @@ export function getStateAtom<Atom>(initialState?: Atom): StateAtom<Atom> {
   const setState = (newState: Atom): void => {
     state = newState;
 
-    handlers.forEach(cb => cb(state));
+    setTimeout(() => handlers.forEach(cb => cb(state)));
   }
 
   const onStateChange = (cb: StateChangeHandler): void => {
