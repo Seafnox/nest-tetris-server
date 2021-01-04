@@ -12,7 +12,7 @@ export class GameWrapper {
   @Prop() score: number;
   @Prop() level: number;
 
-  render() {
+  render(): string {
     return (
       <Host>
         <div class="header">

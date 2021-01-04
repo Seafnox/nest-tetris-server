@@ -35,7 +35,7 @@ export class AppRoot {
     });
   }
 
-  render() {
+  render(): string {
     this.checkNewState();
 
     return (
