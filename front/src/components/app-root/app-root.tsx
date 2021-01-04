@@ -2,6 +2,7 @@ import { Component, h, State } from '@stencil/core';
 import { ClientState } from '../../enums/client-state';
 import { ClientStateMediatorService } from '../../services/client-state-mediator-service';
 import { InjectorFactory } from '../../services/Injector-factory';
+import { Logger } from '../../services/logger/logger';
 
 @Component({
   tag: 'app-root',
@@ -11,12 +12,25 @@ import { InjectorFactory } from '../../services/Injector-factory';
 export class AppRoot {
   @State() clientState: ClientState;
 
-  constructor() {
-    const clientStateProvider = InjectorFactory.get().inject(ClientStateMediatorService);
+  private clientStateProvider: ClientStateMediatorService
 
-    clientStateProvider.onStateChange(state => this.clientState = state);
+  constructor() {
+    this.clientStateProvider = InjectorFactory.get().inject(ClientStateMediatorService);
+
+    this.clientStateProvider.onStateChange(state => {
+      this.clientState = state;
+      this.onClientStateChange(state);
+    });
   }
 
+  @Logger()
+  onClientStateChange(state: ClientState): void {
+    if (state === ClientState.None) {
+      this.clientStateProvider.switchState(ClientState.Signing);
+    }
+  }
+
+  @Logger()
   render(): string {
     return (
       <div>
@@ -31,6 +45,7 @@ export class AppRoot {
     );
   }
 
+  @Logger()
   renderClientView(): string {
     switch (this.clientState) {
       case ClientState.None: return this.renderSuspendView();
@@ -40,18 +55,21 @@ export class AppRoot {
     }
   }
 
+  @Logger()
   renderSuspendView(): string {
     return (
       <suspend-view></suspend-view>
     );
   }
 
+  @Logger()
   renderLoginView(): string {
     return (
       <login-view></login-view>
     );
   }
 
+  @Logger()
   renderErrorView(): string {
     return (
       <div>
