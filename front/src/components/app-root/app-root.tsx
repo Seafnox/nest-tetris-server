@@ -1,6 +1,7 @@
 import { Component, h, State } from '@stencil/core';
-import { GameStateDto } from '~tetris/dto/game-state-dto';
-import { CellDto } from '~tetris/dto/cell-dto';
+import { ClientState } from '../../enums/client-state';
+import { ClientStateMediatorService } from '../../services/client-state-mediator-service';
+import { InjectorFactory } from '../../services/Injector-factory';
 
 @Component({
   tag: 'app-root',
@@ -8,53 +9,60 @@ import { CellDto } from '~tetris/dto/cell-dto';
   shadow: true,
 })
 export class AppRoot {
-  @State() score: number = 0;
-  @State() level: number = 0;
-  @State() nextItem: GameStateDto = [[]];
-  @State() game: GameStateDto = [[]];
+  @State() clientState: ClientState;
 
-  private timer: NodeJS.Timer;
+  constructor() {
+    const clientStateProvider = InjectorFactory.get().inject(ClientStateMediatorService);
 
-  checkNewState(): void {
-    clearTimeout(this.timer);
-    this.timer = setTimeout(() => {
-      this.score = Math.floor(Math.random()*10000);
-      this.level = Math.floor(Math.random()*100);
-      this.nextItem = this.generateState(4,4);
-      this.game = this.generateState(20,10);
-    }, 500);
-  }
-
-  generateState(x: number, y: number): GameStateDto {
-    const randomic = `${Math.random().toString().substr(2)}${Math.random().toString().substr(2)}`;
-    const randomicLength = randomic.length;
-
-    return Array(x).fill(null).map((_, indexX) => {
-      return Array(y).fill(null).map((_, indexY) =>
-        (+randomic[(indexX * indexY) % randomicLength]) >= 5 ? CellDto.FILLED : CellDto.EMPTY)
-    });
+    clientStateProvider.onStateChange(state => this.clientState = state);
   }
 
   render(): string {
-    this.checkNewState();
-
     return (
       <div>
         <header>
-          <h1>Stencil App Starter</h1>
+          <h1>Stencil App Starter ({this.clientState})</h1>
         </header>
 
         <main>
-          <div class="app-home">
-            <p>
-              Welcome to the Stencil App Starter. You can use this starter to build entire apps all with web components using Stencil! Check out our docs on{' '}
-              <a href="https://stenciljs.com">stenciljs.com</a> to get started.
-            </p>
-          </div>
+          { this.renderClientView() }
         </main>
-
-        <game-wrapper score={this.score} level={this.level} nextItem={this.nextItem} state={this.game}></game-wrapper>
       </div>
     );
+  }
+
+  renderClientView(): string {
+    switch (this.clientState) {
+      case ClientState.None: return this.renderSuspendView();
+      case ClientState.Switching: return this.renderSuspendView();
+      case ClientState.Signing: return this.renderLoginView();
+      default: return this.renderErrorView();
+    }
+  }
+
+  renderSuspendView(): string {
+    return (
+      <suspend-view></suspend-view>
+    );
+  }
+
+  renderLoginView(): string {
+    return (
+      <login-view></login-view>
+    );
+  }
+
+  renderErrorView(): string {
+    return (
+      <div>
+        <h2 style={ {background: '#884444'} }>
+          ERROR
+        </h2>
+        <p>
+          Welcome to the Stencil App Starter. You can use this starter to build entire apps all with web components using Stencil! Check out our docs on{' '}
+          <a href="https://stenciljs.com">stenciljs.com</a> to get started.
+        </p>
+      </div>
+    )
   }
 }
