@@ -1,7 +1,7 @@
 export class InjectorFactory {
   private static unit: InjectorService;
 
-  private static get(): InjectorService {
+  public static get(): InjectorService {
     if (!InjectorFactory.unit) {
       InjectorFactory.unit = new InjectorService();
     }
