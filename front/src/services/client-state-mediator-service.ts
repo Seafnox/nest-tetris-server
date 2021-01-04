@@ -1,4 +1,10 @@
 import { ClientState } from '../enums/client-state';
+import { ClientPlayController } from './state-controllers/client-play-controller';
+import { ClientSignController } from './state-controllers/client-sign-controller';
+import { ClientStateController } from './state-controllers/client-state-controller';
+import { ClientSwitchController } from './state-controllers/client-switch-controller';
+import { ClientWatchController } from './state-controllers/client-watch-controller';
+import { InjectorService } from './Injector-factory';
 
 export class ClientStateMediatorService {
   private _activeState: ClientState = ClientState.None;
@@ -10,6 +16,18 @@ export class ClientStateMediatorService {
     [ClientState.Playing]: [ClientState.Switching],
     [ClientState.Watching]: [ClientState.Switching],
   }
+
+  private _activeController: ClientStateController;
+
+  private controllerByTypes: Record<ClientState, new () => ClientStateController> = {
+    [ClientState.None]: null,
+    [ClientState.Signing]: ClientSignController,
+    [ClientState.Switching]: ClientSwitchController,
+    [ClientState.Playing]: ClientPlayController,
+    [ClientState.Watching]: ClientWatchController,
+  }
+
+  constructor(private injector: InjectorService) {}
 
   public set activeState(clientState: ClientState) {
     this._activeState = clientState;
@@ -28,8 +46,13 @@ export class ClientStateMediatorService {
     this.activeState = clientState;
   }
 
-  // TODO
   public stateChanged(clientState: ClientState): void {
-    console.log(clientState);
+    if (this._activeController) {
+      this._activeController.stop();
+    }
+
+    this._activeController = this.injector.inject(this.controllerByTypes[clientState]);
+
+    this._activeController.start();
   }
 }
