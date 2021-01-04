@@ -43,7 +43,9 @@ export class ClientStateMediatorService {
 
   public switchState(clientState: ClientState): void {
     if (!this.availableStates[this.activeState].includes(clientState)) {
-      throw new Error(`Switching state from '${this.activeState}' to '${clientState}' is not valid!`);
+      console.error(`Switching state from '${this.activeState}' to '${clientState}' is not valid!`);
+
+      return;
     }
 
     this.state.setState(clientState);
