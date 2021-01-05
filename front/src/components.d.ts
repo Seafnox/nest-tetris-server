@@ -24,6 +24,14 @@ export namespace Components {
         "score": number;
         "state": GameStateDto;
     }
+    interface LoginView {
+    }
+    interface PlayingView {
+    }
+    interface SuspendView {
+    }
+    interface WatchingView {
+    }
 }
 declare global {
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
@@ -56,12 +64,40 @@ declare global {
         prototype: HTMLGameWrapperElement;
         new (): HTMLGameWrapperElement;
     };
+    interface HTMLLoginViewElement extends Components.LoginView, HTMLStencilElement {
+    }
+    var HTMLLoginViewElement: {
+        prototype: HTMLLoginViewElement;
+        new (): HTMLLoginViewElement;
+    };
+    interface HTMLPlayingViewElement extends Components.PlayingView, HTMLStencilElement {
+    }
+    var HTMLPlayingViewElement: {
+        prototype: HTMLPlayingViewElement;
+        new (): HTMLPlayingViewElement;
+    };
+    interface HTMLSuspendViewElement extends Components.SuspendView, HTMLStencilElement {
+    }
+    var HTMLSuspendViewElement: {
+        prototype: HTMLSuspendViewElement;
+        new (): HTMLSuspendViewElement;
+    };
+    interface HTMLWatchingViewElement extends Components.WatchingView, HTMLStencilElement {
+    }
+    var HTMLWatchingViewElement: {
+        prototype: HTMLWatchingViewElement;
+        new (): HTMLWatchingViewElement;
+    };
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
         "game-field": HTMLGameFieldElement;
         "game-level": HTMLGameLevelElement;
         "game-score": HTMLGameScoreElement;
         "game-wrapper": HTMLGameWrapperElement;
+        "login-view": HTMLLoginViewElement;
+        "playing-view": HTMLPlayingViewElement;
+        "suspend-view": HTMLSuspendViewElement;
+        "watching-view": HTMLWatchingViewElement;
     }
 }
 declare namespace LocalJSX {
@@ -82,12 +118,24 @@ declare namespace LocalJSX {
         "score"?: number;
         "state"?: GameStateDto;
     }
+    interface LoginView {
+    }
+    interface PlayingView {
+    }
+    interface SuspendView {
+    }
+    interface WatchingView {
+    }
     interface IntrinsicElements {
         "app-root": AppRoot;
         "game-field": GameField;
         "game-level": GameLevel;
         "game-score": GameScore;
         "game-wrapper": GameWrapper;
+        "login-view": LoginView;
+        "playing-view": PlayingView;
+        "suspend-view": SuspendView;
+        "watching-view": WatchingView;
     }
 }
 export { LocalJSX as JSX };
@@ -99,6 +147,10 @@ declare module "@stencil/core" {
             "game-level": LocalJSX.GameLevel & JSXBase.HTMLAttributes<HTMLGameLevelElement>;
             "game-score": LocalJSX.GameScore & JSXBase.HTMLAttributes<HTMLGameScoreElement>;
             "game-wrapper": LocalJSX.GameWrapper & JSXBase.HTMLAttributes<HTMLGameWrapperElement>;
+            "login-view": LocalJSX.LoginView & JSXBase.HTMLAttributes<HTMLLoginViewElement>;
+            "playing-view": LocalJSX.PlayingView & JSXBase.HTMLAttributes<HTMLPlayingViewElement>;
+            "suspend-view": LocalJSX.SuspendView & JSXBase.HTMLAttributes<HTMLSuspendViewElement>;
+            "watching-view": LocalJSX.WatchingView & JSXBase.HTMLAttributes<HTMLWatchingViewElement>;
         }
     }
 }
