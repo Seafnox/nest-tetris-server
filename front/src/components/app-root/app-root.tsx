@@ -1,5 +1,6 @@
 import { Component, h, State } from '@stencil/core';
 import { ClientState } from '../../enums/client-state';
+import { ActiveViewService } from '../../services/active-view-service';
 import { ClientStateMediatorService } from '../../services/client-state-mediator-service';
 import { InjectorFactory } from '../../services/Injector-factory';
 import { Logger } from '../../services/logger/logger';
@@ -33,12 +34,12 @@ export class AppRoot {
   @Logger()
   render(): string {
     return (
-      <div>
+      <div class="app-wrapper">
         <header>
-          <h1>Stencil App Starter ({this.clientState})</h1>
+          Stencil App Starter ({this.clientState})
         </header>
 
-        <main>
+        <main class="page-wrapper">
           { this.renderClientView() }
         </main>
       </div>
@@ -58,14 +59,14 @@ export class AppRoot {
   @Logger()
   renderSuspendView(): string {
     return (
-      <suspend-view></suspend-view>
+      <suspend-view id={ActiveViewService.getIdByClientState(this.clientState)}></suspend-view>
     );
   }
 
   @Logger()
   renderLoginView(): string {
     return (
-      <login-view></login-view>
+      <login-view id={ActiveViewService.getIdByClientState(this.clientState)}></login-view>
     );
   }
 
@@ -73,7 +74,7 @@ export class AppRoot {
   renderErrorView(): string {
     return (
       <div>
-        <h2 style={ {background: '#884444'} }>
+        <h2 style={ {color: '#884444', fontWeight: 'bolded'} }>
           ERROR
         </h2>
         <p>
