@@ -1,6 +1,6 @@
 import { Component, h, State } from '@stencil/core';
 import { ClientState } from '../../enums/client-state';
-import { ActiveViewService } from '../../services/active-view-service';
+import { getViewIdByClientState } from '../../helpers/get-view-id-by-client-state';
 import { ClientStateMediatorService } from '../../services/client-state-mediator-service';
 import { InjectorFactory } from '../../services/Injector-factory';
 import { Logger } from '../../services/logger/logger';
@@ -59,14 +59,14 @@ export class AppRoot {
   @Logger()
   renderSuspendView(): string {
     return (
-      <suspend-view id={ActiveViewService.getIdByClientState(this.clientState)}></suspend-view>
+      <suspend-view id={getViewIdByClientState(this.clientState)}></suspend-view>
     );
   }
 
   @Logger()
   renderLoginView(): string {
     return (
-      <login-view id={ActiveViewService.getIdByClientState(this.clientState)}/>
+      <login-view id={getViewIdByClientState(this.clientState)}/>
     );
   }
 
