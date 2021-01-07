@@ -13,7 +13,7 @@ import { Logger } from '../../services/logger/logger';
 export class AppRoot {
   @State() clientState: ClientState;
 
-  private clientStateProvider: ClientStateMediatorService
+  private readonly clientStateProvider: ClientStateMediatorService
 
   constructor() {
     this.clientStateProvider = InjectorFactory.get().inject(ClientStateMediatorService);
@@ -66,7 +66,7 @@ export class AppRoot {
   @Logger()
   renderLoginView(): string {
     return (
-      <login-view id={ActiveViewService.getIdByClientState(this.clientState)}></login-view>
+      <login-view id={ActiveViewService.getIdByClientState(this.clientState)}/>
     );
   }
 

@@ -1,5 +1,7 @@
 import { Component, Host, h, Listen, Element } from '@stencil/core';
 import { generateId } from '../+helpers/generate-id';
+import { InjectorFactory } from '../../services/Injector-factory';
+import { UserStateService } from '../../services/user-state-service';
 
 @Component({
   tag: 'login-view',
@@ -12,6 +14,15 @@ export class LoginView {
   private inputId = generateId('input');
 
   private inputEl: HTMLInputElement;
+  private readonly userStateService: UserStateService;
+
+  constructor() {
+    this.userStateService = InjectorFactory.get().inject(UserStateService);
+  }
+
+  componentDidRender(): void {
+    this.checkInputValue();
+  }
 
   @Listen('keypress', {target: 'window'})
   public onWindowKeyPressed(event: KeyboardEvent): void {
@@ -21,6 +32,14 @@ export class LoginView {
 
     if (event.composedPath()[0] !== this.inputEl) {
       this.inputEl.focus();
+    }
+
+    debugger;
+
+    if (event.code === 'Enter') {
+      this.userStateService.patch({
+        userName: this.inputEl.value,
+      });
     }
   }
 
@@ -37,10 +56,17 @@ export class LoginView {
       <Host>
         <div class="form">
           <h3 class="title">What's your nickname?</h3>
-          <input class="input" id={this.inputId} type="text" maxlength="14"  />
+          <input class="input" id={this.inputId} type="text" maxlength="14" />
         </div>
       </Host>
     );
   }
 
+  private checkInputValue() {
+    this.setInputElement();
+
+    const initialUserName = this.userStateService.snapshot().userName;
+
+    this.inputEl.value = initialUserName ?? '';
+  }
 }
