@@ -1,5 +1,6 @@
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { BaseServerEventDto } from '~tetris/dto/base-server-event-dto';
 import { RegisterUserEventDto } from '~tetris/dto/register-user-event-dto';
 import { SocketEvent } from '~tetris/dto/socket-event';
 import { RecordLike } from '../../interfaces/record-like';
@@ -22,8 +23,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     player.name = payload.userName.toString();
     console.log(SocketEvent.RegisterUser, player.id, player.name);
 
-    this.broadcastFromPlayer(player, SocketEvent.AddUser, { numUsers: this.getConnectedClientCount() });
-    this.emitToWatcher(player, player, SocketEvent.UserLoginSuccess, { numUsers: this.getConnectedClientCount() });
+    this.broadcastFromPlayer<BaseServerEventDto>(player, SocketEvent.AddUser, { numUsers: this.getConnectedClientCount() });
+    this.emitToWatcher<BaseServerEventDto>(player, player, SocketEvent.UserLoginSuccess, { numUsers: this.getConnectedClientCount() });
   }
 
   @SubscribeMessage(SocketEvent.StartNewGame)
@@ -89,7 +90,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return Object.keys(this.server.clients().connected).length;
   }
 
-  private broadcastFromPlayer(player: XSocketClient, eventName: string, data: RecordLike = {}): void {
+  private broadcastFromPlayer<Dto extends RecordLike>(player: XSocketClient, eventName: string, data: Omit<Dto, 'id'|'name'>): void {
     this.broadcast(eventName, {
       id: player.id,
       name: player.name,
@@ -97,11 +98,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     })
   }
 
-  private broadcast(eventName: string, data: RecordLike = {}): void {
+  private broadcast<Dto extends RecordLike>(eventName: string, data: Dto): void {
     this.server.emit(eventName, data);
   }
 
-  private emit(playerId: string, eventName: string, data: RecordLike = {}): void {
+  private emit<Dto extends RecordLike>(playerId: string, eventName: string, data?: Omit<Dto, 'id'|'name'>): void {
     const targetIds = [playerId, ...this.watchers];
     const player: XSocketClient = this.server.clients().connected[playerId];
 
@@ -112,7 +113,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     })
   }
 
-  private emitToWatcher(watcher: XSocketClient, player: XSocketClient, eventName: string, data: RecordLike = {}): void {
+  private emitToWatcher<Dto extends RecordLike>(watcher: XSocketClient, player: XSocketClient, eventName: string, data: Omit<Dto, 'id'|'name'>): void {
     watcher.emit( eventName, {
       id: player.id,
       username: player.name,

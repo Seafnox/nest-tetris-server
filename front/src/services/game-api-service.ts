@@ -1,7 +1,10 @@
+import { BaseServerEventDto } from '~tetris/dto/base-server-event-dto';
 import { DirectionDto } from '~tetris/dto/direction-dto';
 import io from 'socket.io-client';
 import { RegisterUserEventDto } from '~tetris/dto/register-user-event-dto';
 import { SocketEvent } from '~tetris/dto/socket-event';
+
+export type DtoHandler<Dto> = (dto: Dto) => void;
 
 export class GameApiService {
   private socket: SocketIOClient.Socket = io();
@@ -31,47 +34,47 @@ export class GameApiService {
     this.socket.emit(SocketEvent.DropFigure);
   }
 
-  public onLoginSuccess(cb): void {
+  public onLoginSuccess(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.UserLoginSuccess, cb);
   }
 
-  public onUpdateGameState(cb): void {
+  public onUpdateGameState(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.UpdateGameView, cb);
   }
 
-  public onUpdateNextItem(cb): void {
+  public onUpdateNextItem(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.UpdateNextFigure, cb);
   }
 
-  public onUpdateScore(cb): void {
+  public onUpdateScore(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.UpdateScore, cb);
   }
 
-  public onUpdateLevel(cb): void {
+  public onUpdateLevel(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.UpdateLevel, cb);
   }
 
-  public onAddUser(cb): void {
+  public onAddUser(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.AddUser, cb);
   }
 
-  public onRemoveUser(cb): void {
+  public onRemoveUser(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.RemoveUser, cb);
   }
 
-  public onDisconnect(cb): void {
+  public onDisconnect(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.Disconnect, cb);
   }
 
-  public onConnect(cb): void {
+  public onConnect(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.Connect, cb);
   }
 
-  public onReconnectSuccess(cb): void {
+  public onReconnectSuccess(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.ReconnectSuccess, cb);
   }
 
-  public onReconnectFail(cb): void {
+  public onReconnectFail(cb: DtoHandler<BaseServerEventDto>): void {
     this.socket.on(SocketEvent.ReconnectFailed, cb);
   }
 }
