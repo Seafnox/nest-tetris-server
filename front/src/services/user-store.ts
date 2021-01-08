@@ -5,7 +5,7 @@ export interface UserState {
   userName?: string;
 }
 
-export class UserStateService {
+export class UserStore {
   public readonly addUserListener: (cb: (user: UserState) => void) => symbol;
   public readonly removeUserListener: (listenerId: symbol) => void;
 
