@@ -1,5 +1,5 @@
 import { ClientState } from '../enums/client-state';
-import { getStateAtom, StateAtom } from './get-state-atom';
+import { getStateAtom, StateAtom } from '../helpers/get-state-atom';
 import { InjectorService } from './Injector-factory';
 import { ClientPlayController } from './state-controllers/client-play-controller';
 import { ClientSignController } from './state-controllers/client-sign-controller';

@@ -1,4 +1,4 @@
-import { getStateAtom } from './get-state-atom';
+import { getStateAtom } from '../helpers/get-state-atom';
 import { Logger } from './logger/logger';
 
 export interface UserState {

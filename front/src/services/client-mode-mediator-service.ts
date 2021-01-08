@@ -1,5 +1,5 @@
 import { ClientMode } from '../enums/client-mode';
-import { getStateAtom } from './get-state-atom';
+import { getStateAtom } from '../helpers/get-state-atom';
 
 export class ClientModeMediatorService {
   public setClientMode: (mode: ClientMode) => void;
