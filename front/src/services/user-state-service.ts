@@ -13,7 +13,9 @@ export class UserStateService {
   private readonly getUserState: () => UserState;
 
   constructor() {
-    const {setState, addListener, removeListener, getState} = getStateAtom<UserState>({});
+    const {setState, addListener, removeListener, getState} = getStateAtom<UserState>({
+      userName: `test-${Math.floor(Math.random()*1000)}`,
+    });
 
     this.setUser = setState;
     this.getUserState = getState;
