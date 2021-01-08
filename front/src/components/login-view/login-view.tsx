@@ -26,10 +26,6 @@ export class LoginView implements ComponentInterface {
 
   @Listen('keypress', {target: 'window'})
   public onWindowKeyPressed(event: KeyboardEvent): void {
-    if (!this.inputEl) {
-      this.setInputElement();
-    }
-
     if (event.composedPath()[0] !== this.inputEl) {
       this.inputEl.focus();
     }
@@ -37,10 +33,14 @@ export class LoginView implements ComponentInterface {
     debugger;
 
     if (event.code === 'Enter') {
-      this.userStateService.patch({
-        userName: this.inputEl.value,
-      });
+      this.updateUserName();
     }
+  }
+
+  private updateUserName() {
+    this.userStateService.patch({
+      userName: this.inputEl.value,
+    });
   }
 
   private setInputElement(): void {
