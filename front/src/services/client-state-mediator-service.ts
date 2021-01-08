@@ -22,7 +22,7 @@ export class ClientStateMediatorService {
 
   private _activeController: ClientStateController;
 
-  private controllerByTypes: Record<ClientState, new () => ClientStateController> = {
+  private controllerByTypes: Record<ClientState, new (injector: InjectorService) => ClientStateController> = {
     [ClientState.None]: null,
     [ClientState.Signing]: ClientSignController,
     [ClientState.Switching]: ClientSwitchController,
