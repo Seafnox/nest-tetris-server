@@ -1,5 +1,6 @@
 import { ClientState } from '../enums/client-state';
 import { getStateAtom } from '../helpers/get-state-atom';
+import { Logger } from './logger/logger';
 
 export class ClientStateStore {
   private state = getStateAtom<ClientState>(ClientState.None);
@@ -16,6 +17,7 @@ export class ClientStateStore {
     return this.state.addListener(cb);
   }
 
+  @Logger()
   public switchState(clientState: ClientState): void {
     if (!this.availableStates[this.state.getState()].includes(clientState)) {
       console.error(`Switching state from '${this.state.getState()}' to '${clientState}' is not valid!`);

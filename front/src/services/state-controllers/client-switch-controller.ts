@@ -3,6 +3,7 @@ import { ClientState } from '../../enums/client-state';
 import { ClientModeStore } from '../client-mode-store';
 import { ClientStateStore } from '../client-state-store';
 import { InjectorService } from '../Injector-factory';
+import { Logger } from '../logger/logger';
 import { ClientStateController } from './client-state-controller';
 
 export class ClientSwitchController implements ClientStateController {
@@ -14,6 +15,8 @@ export class ClientSwitchController implements ClientStateController {
     this.clientModeMediatorService = injector.inject(ClientModeStore);
     this.clientStateStore = injector.inject(ClientStateStore);
   }
+
+  @Logger()
   public start(): void {
     this.listenerId = this.clientModeMediatorService.addClientModeListener(mode => {
       switch (mode) {

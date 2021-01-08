@@ -4,6 +4,7 @@ import { ClientModeStore } from '../client-mode-store';
 import { ClientStateStore } from '../client-state-store';
 import { GameApiService } from '../game-api-service';
 import { InjectorService } from '../Injector-factory';
+import { Logger } from '../logger/logger';
 import { UserNotificationsService } from '../user-notifications-service';
 import { UserStore } from '../user-store';
 import { ClientStateController } from './client-state-controller';
@@ -23,6 +24,8 @@ export class ClientSignController implements ClientStateController {
     this.clientModeStore = injector.inject(ClientModeStore);
     this.clientStateStore = injector.inject(ClientStateStore);
   }
+
+  @Logger()
   public start(): void {
     this.listenerId = this.userStore.addUserListener(user => {
       if (!user || !user.userName) {
