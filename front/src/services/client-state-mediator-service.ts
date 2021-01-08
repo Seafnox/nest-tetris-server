@@ -1,5 +1,5 @@
 import { ClientState } from '../enums/client-state';
-import { getStateAtom } from '../helpers/get-state-atom';
+import { ClientStateStore } from './client-state-store';
 import { InjectorService } from './Injector-factory';
 import { ClientPlayController } from './state-controllers/client-play-controller';
 import { ClientSignController } from './state-controllers/client-sign-controller';
@@ -8,18 +8,7 @@ import { ClientSwitchController } from './state-controllers/client-switch-contro
 import { ClientWatchController } from './state-controllers/client-watch-controller';
 
 export class ClientStateMediatorService {
-  public addClientStateListener: (cb: (state: ClientState) => void) => symbol;
-
-  private state = getStateAtom<ClientState>(ClientState.None);
-
-  private availableStates: Record<ClientState, ClientState[]> = {
-    [ClientState.None]: [ClientState.Signing],
-    [ClientState.Signing]: [ClientState.Switching],
-    [ClientState.Switching]: [ClientState.Playing, ClientState.Watching],
-    [ClientState.Playing]: [ClientState.Switching],
-    [ClientState.Watching]: [ClientState.Switching],
-  }
-
+  private clientStateStore: ClientStateStore;
   private _activeController: ClientStateController;
 
   private controllerByTypes: Record<ClientState, new (injector: InjectorService) => ClientStateController> = {
@@ -31,23 +20,9 @@ export class ClientStateMediatorService {
   }
 
   constructor(private injector: InjectorService) {
-    this.addClientStateListener = this.state.addListener;
+    this.clientStateStore = this.injector.inject(ClientStateStore);
 
-    this.state.addListener(state => this.stateChanged(state));
-  }
-
-  public get activeState(): ClientState {
-    return this.state.getState();
-  }
-
-  public switchState(clientState: ClientState): void {
-    if (!this.availableStates[this.activeState].includes(clientState)) {
-      console.error(`Switching state from '${this.activeState}' to '${clientState}' is not valid!`);
-
-      return;
-    }
-
-    this.state.setState(clientState);
+    this.clientStateStore.addClientStateListener(state => this.stateChanged(state));
   }
 
   private stateChanged(clientState: ClientState): void {
