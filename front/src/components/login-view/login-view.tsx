@@ -30,7 +30,7 @@ export class LoginView implements ComponentInterface {
       this.inputEl.focus();
     }
 
-    debugger;
+    console.log(event.code, event.key);
 
     if (event.code === 'Enter') {
       this.updateUserName();
@@ -65,7 +65,7 @@ export class LoginView implements ComponentInterface {
   private checkInputValue() {
     this.setInputElement();
 
-    const initialUserName = this.userStateService.snapshot().userName;
+    const initialUserName = this.userStore.snapshot().userName;
 
     this.inputEl.value = initialUserName ?? '';
   }
