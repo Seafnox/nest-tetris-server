@@ -1,4 +1,4 @@
-import { Component, Host, h, Listen, Element } from '@stencil/core';
+import { Component, Host, h, Listen, Element, ComponentInterface } from '@stencil/core';
 import { generateId } from '../+helpers/generate-id';
 import { InjectorFactory } from '../../services/Injector-factory';
 import { UserStateService } from '../../services/user-state-service';
@@ -8,7 +8,7 @@ import { UserStateService } from '../../services/user-state-service';
   styleUrl: 'login-view.css',
   shadow: true,
 })
-export class LoginView {
+export class LoginView implements ComponentInterface {
   @Element() host: HTMLElement;
 
   private inputId = generateId('input');
