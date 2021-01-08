@@ -1,4 +1,4 @@
-export const enum SocketEventDto {
+export const enum SocketEvent {
   RegisterUser = 'registerUser',
   UserLoginSuccess = 'userLoginSuccess',
   AddUser = 'AddUser',
