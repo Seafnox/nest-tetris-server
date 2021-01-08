@@ -18,7 +18,7 @@ export class AppRoot {
   constructor() {
     this.clientStateProvider = InjectorFactory.get().inject(ClientStateMediatorService);
 
-    this.clientStateProvider.onStateChange(state => {
+    this.clientStateProvider.addClientStateListener(state => {
       this.clientState = state;
       this.onClientStateChange(state);
     });

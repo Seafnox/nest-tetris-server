@@ -1,5 +1,5 @@
 import { ClientState } from '../enums/client-state';
-import { getStateAtom, StateAtom } from '../helpers/get-state-atom';
+import { getStateAtom } from '../helpers/get-state-atom';
 import { InjectorService } from './Injector-factory';
 import { ClientPlayController } from './state-controllers/client-play-controller';
 import { ClientSignController } from './state-controllers/client-sign-controller';
@@ -8,9 +8,9 @@ import { ClientSwitchController } from './state-controllers/client-switch-contro
 import { ClientWatchController } from './state-controllers/client-watch-controller';
 
 export class ClientStateMediatorService {
-  public onStateChange: (cb: (state: ClientState) => void) => void;
+  public addClientStateListener: (cb: (state: ClientState) => void) => symbol;
 
-  private state: StateAtom<ClientState>;
+  private state = getStateAtom<ClientState>(ClientState.None);
 
   private availableStates: Record<ClientState, ClientState[]> = {
     [ClientState.None]: [ClientState.Signing],
@@ -31,10 +31,9 @@ export class ClientStateMediatorService {
   }
 
   constructor(private injector: InjectorService) {
-    this.state = getStateAtom<ClientState>(ClientState.None);
-    this.onStateChange = this.state.onStateChange;
+    this.addClientStateListener = this.state.addListener;
 
-    this.state.onStateChange(state => this.stateChanged(state));
+    this.state.addListener(state => this.stateChanged(state));
   }
 
   public get activeState(): ClientState {

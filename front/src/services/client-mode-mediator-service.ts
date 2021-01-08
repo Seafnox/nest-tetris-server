@@ -3,14 +3,14 @@ import { getStateAtom } from '../helpers/get-state-atom';
 
 export class ClientModeMediatorService {
   public setClientMode: (mode: ClientMode) => void;
-  public onClientModeChange: (cb: (mode: ClientMode) => void) => void;
+  public addClientModeListener: (cb: (mode: ClientMode) => void) => symbol;
 
   constructor() {
-    const {onStateChange, setState} = getStateAtom<ClientMode>();
+    const {addListener, setState} = getStateAtom<ClientMode>();
     this.setClientMode = setState;
-    this.onClientModeChange = onStateChange;
+    this.addClientModeListener = addListener;
 
-    this.onClientModeChange(mode => this.clientModeChanged(mode));
+    this.addClientModeListener(mode => this.clientModeChanged(mode));
   }
 
   private clientModeChanged(mode: ClientMode): void {

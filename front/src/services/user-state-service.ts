@@ -6,17 +6,19 @@ export interface UserState {
 }
 
 export class UserStateService {
-  public readonly onUserChange: (cb: (user: UserState) => void) => void;
+  public readonly addUserListener: (cb: (user: UserState) => void) => symbol;
+  public readonly removeUserListener: (listenerId: symbol) => void;
 
   private readonly setUser: (state: UserState) => void;
   private readonly getUserState: () => UserState;
 
   constructor() {
-    const {setState, onStateChange, getState} = getStateAtom<UserState>();
+    const {setState, addListener, removeListener, getState} = getStateAtom<UserState>({});
 
     this.setUser = setState;
     this.getUserState = getState;
-    this.onUserChange = onStateChange;
+    this.addUserListener = addListener;
+    this.removeUserListener = removeListener;
   }
 
   @Logger()

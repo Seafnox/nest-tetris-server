@@ -1,32 +1,52 @@
 export interface StateAtom<Atom> {
   setState(newState: Atom): void;
-  onStateChange(cb: (state: Atom) => void): void;
   getState(): Atom;
+  addListener(cb: (state: Atom) => void): symbol;
+  removeListener(listenerId: symbol): void;
 }
 
 export function getStateAtom<Atom>(initialState?: Atom): StateAtom<Atom> {
   type StateChangeHandler = (state: Atom) => void;
 
   let state: Atom = initialState;
-  const handlers: StateChangeHandler[] = [];
+  const listenState = {
+    listenerIds: [], // symbol[]
+    listeners: {}, // Record<symbol, StateChangeHandler>
+  }
 
   const setState = (newState: Atom): void => {
     state = newState;
 
-    setTimeout(() => handlers.forEach(cb => cb(state)));
+    setTimeout(() => {
+      listenState.listenerIds.forEach(listenerId => listenState.listeners[listenerId](state));
+    });
   }
 
-  const onStateChange = (cb: StateChangeHandler): void => {
-    handlers.push(cb);
+  const addListener = (cb: StateChangeHandler): symbol => {
+    const listenerId = Symbol();
 
-    cb(state);
+    listenState.listeners[listenerId] = cb;
+    listenState.listenerIds = [
+      ...listenState.listenerIds,
+      listenerId,
+    ]
+
+    setTimeout(() => cb(state));
+
+    return listenerId;
+  }
+
+  const removeListener = (listenerId: symbol): void => {
+    listenState.listenerIds = listenState.listenerIds.filter(current => current !== listenerId);
+    listenState.listeners[listenerId] = undefined;
   }
 
   const getState = (): Atom => state;
 
   return {
     setState,
-    onStateChange,
     getState,
+    addListener,
+    removeListener,
   }
 }
