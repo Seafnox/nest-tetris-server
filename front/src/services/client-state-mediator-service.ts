@@ -1,6 +1,7 @@
 import { ClientState } from '../enums/client-state';
 import { ClientStateStore } from './client-state-store';
 import { InjectorService } from './Injector-factory';
+import { ClientInitialController } from './state-controllers/client-initial-controller';
 import { ClientPlayController } from './state-controllers/client-play-controller';
 import { ClientSignController } from './state-controllers/client-sign-controller';
 import { ClientStateController } from './state-controllers/client-state-controller';
@@ -12,7 +13,7 @@ export class ClientStateMediatorService {
   private _activeController: ClientStateController;
 
   private controllerByTypes: Record<ClientState, new (injector: InjectorService) => ClientStateController> = {
-    [ClientState.None]: null,
+    [ClientState.None]: ClientInitialController,
     [ClientState.Signing]: ClientSignController,
     [ClientState.Switching]: ClientSwitchController,
     [ClientState.Playing]: ClientPlayController,
@@ -28,10 +29,6 @@ export class ClientStateMediatorService {
   private stateChanged(clientState: ClientState): void {
     if (this._activeController) {
       this._activeController.stop();
-    }
-
-    if (clientState === ClientState.None) {
-      return;
     }
 
     this._activeController = this.injector.inject(this.controllerByTypes[clientState]);

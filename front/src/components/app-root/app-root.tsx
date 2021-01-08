@@ -1,7 +1,7 @@
 import { Component, h, State } from '@stencil/core';
 import { ClientState } from '../../enums/client-state';
 import { getViewIdByClientState } from '../../helpers/get-view-id-by-client-state';
-import { ClientStateMediatorService } from '../../services/client-state-mediator-service';
+import { ClientStateStore } from '../../services/client-state-store';
 import { InjectorFactory } from '../../services/Injector-factory';
 import { Logger } from '../../services/logger/logger';
 
@@ -13,22 +13,14 @@ import { Logger } from '../../services/logger/logger';
 export class AppRoot {
   @State() clientState: ClientState;
 
-  private readonly clientStateProvider: ClientStateMediatorService
+  private readonly clientStateStore: ClientStateStore
 
   constructor() {
-    this.clientStateProvider = InjectorFactory.get().inject(ClientStateMediatorService);
+    this.clientStateStore = InjectorFactory.get().inject(ClientStateStore);
 
-    this.clientStateProvider.addClientStateListener(state => {
+    this.clientStateStore.addClientStateListener(state => {
       this.clientState = state;
-      this.onClientStateChange(state);
     });
-  }
-
-  @Logger()
-  onClientStateChange(state: ClientState): void {
-    if (state === ClientState.None) {
-      this.clientStateProvider.switchState(ClientState.Signing);
-    }
   }
 
   @Logger()
