@@ -13,7 +13,7 @@ export class ClientStateMediatorService {
   private _activeController: ClientStateController;
 
   private controllerByTypes: Record<ClientState, new (injector: InjectorService) => ClientStateController> = {
-    [ClientState.None]: ClientInitialController,
+    [ClientState.Init]: ClientInitialController,
     [ClientState.Signing]: ClientSignController,
     [ClientState.Switching]: ClientSwitchController,
     [ClientState.Playing]: ClientPlayController,
@@ -22,7 +22,9 @@ export class ClientStateMediatorService {
 
   constructor(private injector: InjectorService) {
     this.clientStateStore = this.injector.inject(ClientStateStore);
+  }
 
+  public init(): void {
     this.clientStateStore.addClientStateListener(state => this.stateChanged(state));
   }
 

@@ -1,6 +1,7 @@
 import { Component, h, State } from '@stencil/core';
 import { ClientState } from '../../enums/client-state';
 import { getViewIdByClientState } from '../../helpers/get-view-id-by-client-state';
+import { ClientStateMediatorService } from '../../services/client-state-mediator-service';
 import { ClientStateStore } from '../../services/client-state-store';
 import { InjectorFactory } from '../../services/Injector-factory';
 import { Logger } from '../../services/logger/logger';
@@ -17,7 +18,9 @@ export class AppRoot {
 
   constructor() {
     this.clientStateStore = InjectorFactory.get().inject(ClientStateStore);
+    const controllerMediator = InjectorFactory.get().inject(ClientStateMediatorService);
 
+    controllerMediator.init();
     this.clientStateStore.addClientStateListener(state => {
       this.clientState = state;
     });
@@ -41,7 +44,7 @@ export class AppRoot {
   @Logger()
   renderClientView(): string {
     switch (this.clientState) {
-      case ClientState.None: return this.renderSuspendView();
+      case ClientState.Init: return this.renderSuspendView();
       case ClientState.Switching: return this.renderSuspendView();
       case ClientState.Signing: return this.renderLoginView();
       default: return this.renderErrorView();

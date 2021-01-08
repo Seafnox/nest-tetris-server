@@ -1,5 +1,5 @@
 export const enum ClientState {
-  None = 'None',
+  Init = 'Init',
   Signing = 'Signing',
   Playing = 'Playing',
   Watching = 'Watching',

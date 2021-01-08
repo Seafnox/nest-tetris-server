@@ -3,10 +3,10 @@ import { getStateAtom } from '../helpers/get-state-atom';
 import { Logger } from './logger/logger';
 
 export class ClientStateStore {
-  private state = getStateAtom<ClientState>(ClientState.None);
+  private state = getStateAtom<ClientState>(ClientState.Init);
 
   private availableStates: Record<ClientState, ClientState[]> = {
-    [ClientState.None]: [ClientState.Signing],
+    [ClientState.Init]: [ClientState.Signing],
     [ClientState.Signing]: [ClientState.Switching],
     [ClientState.Switching]: [ClientState.Playing, ClientState.Watching],
     [ClientState.Playing]: [ClientState.Switching],
