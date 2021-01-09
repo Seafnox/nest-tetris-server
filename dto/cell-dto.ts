@@ -1,4 +1,4 @@
-export enum CellDto {
+export const enum CellDto {
     EMPTY = ' ',
     FILLED = '.',
 }
