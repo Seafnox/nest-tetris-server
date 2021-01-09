@@ -17,6 +17,13 @@ export const getArgsStrings = function(argValues: any[], func: Function, options
   }).map(function (argNameIndex: number): string {
     if (argNameIndex === -1 || argNameIndex >= argValues.length) return '';
 
-    return `[${argNames[argNameIndex]}=${argValues[argNameIndex]}]`
+    try {
+      if (typeof argValues[argNameIndex] === 'object') {
+        return `[${argNames[argNameIndex]}=${JSON.stringify(argValues[argNameIndex])}]`
+      }
+      return `[${argNames[argNameIndex]}=${argValues[argNameIndex]}]`
+    } catch (e) {
+      return `[${argNames[argNameIndex]}=${argValues[argNameIndex]}]`
+    }
   });
 };

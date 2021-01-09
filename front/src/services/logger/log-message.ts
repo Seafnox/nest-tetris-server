@@ -23,6 +23,6 @@ export const logMessage = function(isStart: boolean, targetInstance, functionNam
   const startEndStr = isStart ? 'start' : 'end';
   logFunction(`${time}${classNameStr}${functionName}\t${startEndStr}`);
 
-  args && args.length !== 0 && logFunction(`\t\tFunction arguments:\t${args.join(' ')}`);
-  props && props.length !== 0 && logFunction(`\t\tClass properties:\t${props.join(' ')}`);
+  args && args.length !== 0 && logFunction(`\tFunction arguments:\n\t\t${args.join('\n\t\t')}`);
+  props && props.length !== 0 && logFunction(`\tClass properties:\n\t\t${props.join('\n\t\t')}`);
 };
