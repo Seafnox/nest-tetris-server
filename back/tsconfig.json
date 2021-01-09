@@ -9,10 +9,13 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "../",
+    "rootDirs": [
+      "./",
+      "../dto/"
+    ],
     "baseUrl": "./",
     "paths": {
-      "~tetris/dto/*": ["../dto/*"],
+      "~tetris/dto/*": ["../dto/*"]
     },
     "incremental": true
   },
