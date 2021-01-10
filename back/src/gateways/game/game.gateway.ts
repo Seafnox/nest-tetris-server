@@ -19,12 +19,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(SocketEvent.RegisterUser)
-  addUser(player: XSocketClient, payload: RegisterUserEventDto): void {
+  async addUser(player: XSocketClient, payload: RegisterUserEventDto): Promise<void> {
     player.name = payload.userName.toString();
     console.log(SocketEvent.RegisterUser, player.id, player.name);
 
-    this.broadcastFromPlayer<BaseServerEventDto>(player, SocketEvent.AddUser, { numUsers: this.getConnectedClientCount() });
-    this.emitToWatcher<BaseServerEventDto>(player, player, SocketEvent.UserLoginSuccess, { numUsers: this.getConnectedClientCount() });
+    const numUsers = await this.getConnectedClientCount();
+
+    this.broadcastFromPlayer<BaseServerEventDto>(player, SocketEvent.AddUser, { numUsers });
+    this.emitToWatcher<BaseServerEventDto>(player, player, SocketEvent.UserLoginSuccess, { numUsers });
   }
 
   @SubscribeMessage(SocketEvent.StartNewGame)
@@ -74,7 +76,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   public handleConnection<T>(player: XSocketClient, ...args: T[]): void {
-    console.log(SocketEvent.Connect, player.id, player.name, args);
+    console.log(SocketEvent.ConnectSuccess, player.id, player.name, args);
   }
 
   public handleDisconnect(player: XSocketClient): void {
@@ -86,8 +88,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.broadcastFromPlayer(player, SocketEvent.RemoveUser, { numUsers: this.getConnectedClientCount() });
   }
 
-  private getConnectedClientCount(): number {
-    return Object.keys(this.server.clients().connected).length;
+  private async getConnectedClientCount(): Promise<number> {
+    return (await this.server.allSockets()).size;
   }
 
   private broadcastFromPlayer<Dto extends RecordLike>(player: XSocketClient, eventName: string, data: Omit<Dto, 'id'|'name'>): void {
@@ -104,10 +106,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private emit<Dto extends RecordLike>(playerId: string, eventName: string, data?: Omit<Dto, 'id'|'name'>): void {
     const targetIds = [playerId, ...this.watchers];
-    const player: XSocketClient = this.server.clients().connected[playerId];
+    const player: XSocketClient = this.server.sockets.sockets.get(playerId);
 
     targetIds.forEach(targetId => {
-      const watcher: XSocketClient = this.server.clients().connected[targetId];
+      const watcher: XSocketClient = this.server.sockets.sockets.get(targetId);
 
       this.emitToWatcher(watcher, player, eventName, data);
     })
