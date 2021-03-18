@@ -1,54 +1,54 @@
+import { Subscription } from 'rxjs';
+import { switchMap, filter, mapTo } from 'rxjs/operators';
+import { BaseServerEventDto } from '~tetris/dto/base-server-event-dto';
 import { ClientMode } from '../../enums/client-mode';
-import { ClientState } from '../../enums/client-state';
-import { ClientModeStore } from '../client-mode-store';
-import { ClientStateStore } from '../client-state-store';
+import { ClientStatus } from '../../enums/client-status';
+import { UserStore } from '../user-store';
 import { GameApiService } from '../game-api-service';
 import { InjectorService } from '../Injector-factory';
 import { Logger } from '../logger/logger';
 import { UserNotificationsService } from '../user-notifications-service';
-import { UserStore } from '../user-store';
 import { ClientStateController } from './client-state-controller';
 
 export class ClientSignController implements ClientStateController {
-  private readonly userStore: UserStore;
-  private readonly gameApiService: GameApiService;
-  private readonly userNotificationsService: UserNotificationsService;
-  private readonly clientModeStore: ClientModeStore;
-  private readonly clientStateStore: ClientStateStore;
-  private listenerId: symbol;
+  private readonly gameApiService = this.injector.inject(GameApiService);
+  private readonly userNotificationsService = this.injector.inject(UserNotificationsService);
+  private readonly clientStore = this.injector.inject(UserStore);
+  private signInSub: Subscription;
+  private signOnSub: Subscription;
 
-  constructor(injector: InjectorService) {
-    this.userStore = injector.inject(UserStore);
-    this.gameApiService = injector.inject(GameApiService);
-    this.userNotificationsService = injector.inject(UserNotificationsService);
-    this.clientModeStore = injector.inject(ClientModeStore);
-    this.clientStateStore = injector.inject(ClientStateStore);
-  }
+  constructor(private injector: InjectorService) {}
 
   @Logger()
   public start(): void {
-    this.listenerId = this.userStore.addUserListener(user => {
-      if (!user || !user.userName) {
-        return;
-      }
+    this.signInSub = this.clientStore.userName$().pipe(
+        filter<string>(Boolean),
+        switchMap(userName => this.gameApiService.whenConnected$().pipe(mapTo(userName)))
+      )
+      .subscribe(userName => this.gameApiService.registerUser({ userName }));
 
-      this.gameApiService.registerUser({
-        userName: user.userName,
-      });
-    });
-
-    // TODO Fix infinity subscription
-    this.gameApiService.onLoginSuccess(dto => {
-      this.userNotificationsService.pushNotification({
-        message: `There ${dto.numUsers} user${dto.numUsers === 1 ? '' : 's'} now`,
-      });
-      this.clientModeStore.setClientMode(ClientMode.WatchingMode);
-      this.clientStateStore.switchState(ClientState.Switching);
-    });
+    this.signOnSub = this.gameApiService.whenConnected$()
+      .pipe(
+        switchMap(() => this.gameApiService.onSignOn$),
+      )
+      .subscribe(dto => this.onSignOn(dto));
   }
 
+  @Logger()
   public stop(): void {
-    this.userStore.removeUserListener(this.listenerId);
-    this.listenerId = undefined;
+    this.signInSub?.unsubscribe();
+    this.signInSub = undefined;
+
+    this.signOnSub?.unsubscribe();
+    this.signOnSub = undefined;
+  }
+
+  @Logger()
+  private onSignOn(dto: BaseServerEventDto) {
+    this.userNotificationsService.pushNotification({
+      message: `There ${dto.numUsers} user${dto.numUsers === 1 ? '' : 's'} now`,
+    });
+    this.clientStore.setClientMode(ClientMode.WatchingMode);
+    this.clientStore.switchStatus(ClientStatus.Switching);
   }
 }

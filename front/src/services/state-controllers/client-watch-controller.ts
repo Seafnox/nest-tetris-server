@@ -6,6 +6,7 @@ export class ClientWatchController implements ClientStateController {
   public start(): void {
   }
 
+  @Logger()
   public stop(): void {
   }
 }

@@ -1,21 +1,20 @@
-import { ClientState } from '../../enums/client-state';
-import { ClientStateStore } from '../client-state-store';
+import { ClientStatus } from '../../enums/client-status';
+import { UserStore } from '../user-store';
 import { InjectorService } from '../Injector-factory';
 import { Logger } from '../logger/logger';
 import { ClientStateController } from './client-state-controller';
 
 export class ClientInitialController implements ClientStateController {
-  private readonly clientStateStore: ClientStateStore;
+  private readonly clientStore = this.injector.inject(UserStore);
 
-  constructor(injector: InjectorService) {
-    this.clientStateStore = injector.inject(ClientStateStore);
-  }
+  constructor(private readonly injector: InjectorService) {}
 
   @Logger()
   public start(): void {
-    return this.clientStateStore.switchState(ClientState.Signing);
+    return this.clientStore.switchStatus(ClientStatus.Signing);
   }
 
+  @Logger()
   public stop(): void {
   }
 }

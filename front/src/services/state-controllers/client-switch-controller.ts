@@ -1,34 +1,32 @@
+import { Subscription } from 'rxjs';
 import { ClientMode } from '../../enums/client-mode';
-import { ClientState } from '../../enums/client-state';
-import { ClientModeStore } from '../client-mode-store';
-import { ClientStateStore } from '../client-state-store';
+import { ClientStatus } from '../../enums/client-status';
+import { UserStore } from '../user-store';
 import { InjectorService } from '../Injector-factory';
 import { Logger } from '../logger/logger';
 import { ClientStateController } from './client-state-controller';
 
 export class ClientSwitchController implements ClientStateController {
-  private readonly clientModeMediatorService: ClientModeStore;
-  private readonly clientStateStore: ClientStateStore;
-  private listenerId: symbol;
+  private readonly clientStore = this.injector.inject(UserStore);
+  private subscription: Subscription;
 
-  constructor(injector: InjectorService) {
-    this.clientModeMediatorService = injector.inject(ClientModeStore);
-    this.clientStateStore = injector.inject(ClientStateStore);
-  }
+  constructor(private injector: InjectorService) {}
 
   @Logger()
   public start(): void {
-    this.listenerId = this.clientModeMediatorService.addClientModeListener(mode => {
+    this.subscription = this.clientStore.mode$().subscribe(mode => {
       switch (mode) {
         case ClientMode.WatchingMode:
-          return this.clientStateStore.switchState(ClientState.Watching);
+          return this.clientStore.switchStatus(ClientStatus.Watching);
         case ClientMode.PlayingMode:
-          return this.clientStateStore.switchState(ClientState.Playing);
+          return this.clientStore.switchStatus(ClientStatus.Playing);
       }
     })
   }
 
+  @Logger()
   public stop(): void {
-    this.clientModeMediatorService.removeClientModeListener(this.listenerId);
+    this.subscription?.unsubscribe();
+    this.subscription = undefined;
   }
 }

@@ -6,6 +6,7 @@ export class ClientPlayController implements ClientStateController {
   public start(): void {
   }
 
+  @Logger()
   public stop(): void {
   }
 }
