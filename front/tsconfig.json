@@ -11,10 +11,13 @@
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2017",
-    "rootDir": "../",
+    "rootDirs": [
+      "./",
+      "../dto/"
+    ],
     "baseUrl": "./",
     "paths": {
-      "~tetris/dto/*": ["../dto/*"],
+      "~tetris/dto/*": ["../dto/*"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,
