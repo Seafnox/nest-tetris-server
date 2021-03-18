@@ -1,7 +1,7 @@
 import { Component, Host, h, Listen, Element, ComponentInterface } from '@stencil/core';
 import { generateId } from '../+helpers/generate-id';
-import { InjectorFactory } from '../../services/Injector-factory';
 import { UserStore } from '../../services/user-store';
+import { InjectorFactory } from '../../services/Injector-factory';
 
 @Component({
   tag: 'login-view',
@@ -14,11 +14,7 @@ export class LoginView implements ComponentInterface {
   private inputId = generateId('input');
 
   private inputEl: HTMLInputElement;
-  private readonly userStore: UserStore;
-
-  constructor() {
-    this.userStore = InjectorFactory.get().inject(UserStore);
-  }
+  private readonly userStore = InjectorFactory.get().inject(UserStore);
 
   componentDidRender(): void {
     this.checkInputValue();
@@ -38,9 +34,7 @@ export class LoginView implements ComponentInterface {
   }
 
   private updateUserName() {
-    this.userStore.patch({
-      userName: this.inputEl.value,
-    });
+    this.userStore.setUserName(this.inputEl.value);
   }
 
   private setInputElement(): void {

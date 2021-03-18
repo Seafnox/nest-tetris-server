@@ -1,8 +1,8 @@
-import { Component, h, State } from '@stencil/core';
-import { ClientState } from '../../enums/client-state';
+import { Component, h, State, ComponentInterface } from '@stencil/core';
+import { ClientStatus } from '../../enums/client-status';
 import { getViewIdByClientState } from '../../helpers/get-view-id-by-client-state';
-import { ClientStateMediatorService } from '../../services/client-state-mediator-service';
-import { ClientStateStore } from '../../services/client-state-store';
+import { ClientStatusMediatorService } from '../../services/client-status-mediator-service';
+import { UserStore } from '../../services/user-store';
 import { InjectorFactory } from '../../services/Injector-factory';
 import { Logger } from '../../services/logger/logger';
 
@@ -11,20 +11,25 @@ import { Logger } from '../../services/logger/logger';
   styleUrl: 'app-root.css',
   shadow: true,
 })
-export class AppRoot {
-  @State() clientState: ClientState;
+export class AppRoot implements ComponentInterface {
+  @State() clientState: ClientStatus;
 
-  private readonly clientStateStore: ClientStateStore
+  private readonly clientStateStore = InjectorFactory.get().inject(UserStore);
+  private readonly controllerMediator = InjectorFactory.get().inject(ClientStatusMediatorService);
 
   constructor() {
-    this.clientStateStore = InjectorFactory.get().inject(ClientStateStore);
-    const controllerMediator = InjectorFactory.get().inject(ClientStateMediatorService);
+    this.controllerMediator.init();
 
-    controllerMediator.init();
-    this.clientStateStore.addClientStateListener(state => {
+    this.clientStateStore.status$().subscribe(state => {
       this.clientState = state;
     });
   }
+
+  @Logger()
+  public connectedCallback() {}
+
+  @Logger()
+  public disconnectedCallback() {}
 
   @Logger()
   render(): string {
@@ -44,9 +49,9 @@ export class AppRoot {
   @Logger()
   renderClientView(): string {
     switch (this.clientState) {
-      case ClientState.Init: return this.renderSuspendView();
-      case ClientState.Switching: return this.renderSuspendView();
-      case ClientState.Signing: return this.renderLoginView();
+      case ClientStatus.Init: return this.renderSuspendView();
+      case ClientStatus.Switching: return this.renderSuspendView();
+      case ClientStatus.Signing: return this.renderLoginView();
       default: return this.renderErrorView();
     }
   }
