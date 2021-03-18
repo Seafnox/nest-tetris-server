@@ -13,12 +13,13 @@
   },
   "devDependencies": {
     "@stencil/core": "^2.0.0",
-    "@types/socket.io-client": "^1.4.34",
+    "@types/socket.io-client": "^1.4.36",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "workbox-build": "^6.0.2"
   },
   "license": "MIT",
   "dependencies": {
-    "socket.io-client": "^3.0.4"
+    "rxjs": "^6.6.6",
+    "socket.io-client": "^2.4.0"
   }
 }

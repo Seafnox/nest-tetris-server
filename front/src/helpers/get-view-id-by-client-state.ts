@@ -1,5 +1,5 @@
-import { ClientState } from '../enums/client-state';
+import { ClientStatus } from '../enums/client-status';
 
-export function getViewIdByClientState(state: ClientState): string {
+export function getViewIdByClientState(state: ClientStatus): string {
   return `${state.toLowerCase()}-view`;
 }
