@@ -7,7 +7,14 @@ import { RecordLike } from '../../interfaces/record-like';
 import { GameService } from '../../services/game.service';
 import { XSocketClient } from '../../interfaces/x-socket-client';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: "localhost",
+    methods: ["GET", "POST"],
+    allowedHeaders: [],
+    credentials: true
+  }
+})
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
@@ -19,11 +26,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(SocketEvent.RegisterUser)
-  async addUser(player: XSocketClient, payload: RegisterUserEventDto): Promise<void> {
+  addUser(player: XSocketClient, payload: RegisterUserEventDto): void {
     player.name = payload.userName.toString();
     console.log(SocketEvent.RegisterUser, player.id, player.name);
 
-    const numUsers = await this.getConnectedClientCount();
+    const numUsers = this.getConnectedClientCount();
 
     this.broadcastFromPlayer<BaseServerEventDto>(player, SocketEvent.AddUser, { numUsers });
     this.emitToWatcher<BaseServerEventDto>(player, player, SocketEvent.UserLoginSuccess, { numUsers });
@@ -75,6 +82,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  @SubscribeMessage(SocketEvent.ConnectFailed)
+  public onConnected<T>(player: XSocketClient, ...args: T[]): void {
+    console.log(SocketEvent.ConnectFailed, 'v2', player.id, player.name, args);
+  }
+
+  @SubscribeMessage(SocketEvent.ConnectSuccess)
+  public onConnectFailed<T>(player: XSocketClient, ...args: T[]): void {
+    console.log(SocketEvent.ConnectSuccess, 'v2', player.id, player.name, args);
+  }
+
   public handleConnection<T>(player: XSocketClient, ...args: T[]): void {
     console.log(SocketEvent.ConnectSuccess, player.id, player.name, args);
   }
@@ -88,8 +105,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.broadcastFromPlayer(player, SocketEvent.RemoveUser, { numUsers: this.getConnectedClientCount() });
   }
 
-  private async getConnectedClientCount(): Promise<number> {
-    return (await this.server.allSockets()).size;
+  private getConnectedClientCount(): number {
+    return this.server.sockets.sockets.size;
   }
 
   private broadcastFromPlayer<Dto extends RecordLike>(player: XSocketClient, eventName: string, data: Omit<Dto, 'id'|'name'>): void {
