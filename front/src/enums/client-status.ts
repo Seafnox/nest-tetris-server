@@ -1,4 +1,4 @@
-export const enum ClientState {
+export const enum ClientStatus {
   Init = 'Init',
   Signing = 'Signing',
   Playing = 'Playing',
