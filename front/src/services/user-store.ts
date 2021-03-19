@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, distinctUntilChanged } from 'rxjs/operators';
+import { map, distinctUntilChanged, delay } from 'rxjs/operators';
 import { ClientMode } from '../enums/client-mode';
 import { ClientStatus } from '../enums/client-status';
 import { ClientStatusGuard } from './client-status-guard';
@@ -25,17 +25,14 @@ export class UserStore {
 
   constructor(private injector: InjectorService) {}
 
-  @Logger()
   public setClientMode(mode: ClientMode): void {
     this.patchState({ mode });
   }
 
-  @Logger()
   public setUserName(userName: string): void {
     this.patchState({ userName });
   }
 
-  @Logger()
   public switchStatus(status: ClientStatus): void {
     const state = this.getState();
 
@@ -49,7 +46,7 @@ export class UserStore {
   }
 
   public state$(): Observable<UserState> {
-    return this.state.asObservable();
+    return this.state.asObservable().pipe(delay(0));
   }
 
   public mode$(): Observable<ClientMode> {
@@ -77,12 +74,13 @@ export class UserStore {
     return this.state.value;
   }
 
+  @Logger()
   private patchState(state: Partial<UserState>): void {
     const prevState = this.getState();
 
     this.state.next({
       ...prevState,
       ...state,
-    })
+    });
   }
 }
