@@ -44,12 +44,25 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameService.startPlayerGame(player.id);
   }
 
+  @SubscribeMessage(SocketEvent.StopPlayingMode)
+  stopPlaying(player: XSocketClient, payload: unknown): void {
+    console.log(SocketEvent.StopPlayingMode, player.id, player.name, JSON.stringify(payload));
+    this.gameService.stopPlayerGame(player.id);
+  }
+
   @SubscribeMessage(SocketEvent.StartWatchingMode)
   startWatching(player: XSocketClient, payload: unknown): void {
     console.log(SocketEvent.StartWatchingMode, player.id, player.name, JSON.stringify(payload));
     this.gameService.stopPlayerGame(player.id);
 
     this.watchers = [player.id, ...this.watchers];
+  }
+
+  @SubscribeMessage(SocketEvent.StopWatchingMode)
+  stopWatching(player: XSocketClient, payload: unknown): void {
+    console.log(SocketEvent.StopWatchingMode, player.id, player.name, JSON.stringify(payload));
+
+    this.watchers = this.watchers.filter(watcherId => watcherId !== player.id);
   }
 
   @SubscribeMessage(SocketEvent.MoveFigure)
