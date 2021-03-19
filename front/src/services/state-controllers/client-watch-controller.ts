@@ -1,7 +1,7 @@
 import { Logger } from '../logger/logger';
-import { ClientStateController } from './client-state-controller';
+import { ClientStatusController } from './client-status-controller';
 
-export class ClientWatchController implements ClientStateController {
+export class ClientWatchController implements ClientStatusController {
   @Logger()
   public start(): void {
   }

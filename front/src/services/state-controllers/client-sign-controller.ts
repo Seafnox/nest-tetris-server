@@ -8,9 +8,9 @@ import { GameApiService } from '../game-api-service';
 import { InjectorService } from '../Injector-factory';
 import { Logger } from '../logger/logger';
 import { UserNotificationsService } from '../user-notifications-service';
-import { ClientStateController } from './client-state-controller';
+import { ClientStatusController } from './client-status-controller';
 
-export class ClientSignController implements ClientStateController {
+export class ClientSignController implements ClientStatusController {
   private readonly gameApiService = this.injector.inject(GameApiService);
   private readonly userNotificationsService = this.injector.inject(UserNotificationsService);
   private readonly clientStore = this.injector.inject(UserStore);
