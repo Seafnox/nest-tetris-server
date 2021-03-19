@@ -1,4 +1,5 @@
 import { Component, h, State, ComponentInterface } from '@stencil/core';
+import { throttleTime } from 'rxjs/operators';
 import { ClientStatus } from '../../enums/client-status';
 import { getViewIdByClientState } from '../../helpers/get-view-id-by-client-state';
 import { ClientStatusMediatorService } from '../../services/client-status-mediator-service';
@@ -14,15 +15,18 @@ import { Logger } from '../../services/logger/logger';
 export class AppRoot implements ComponentInterface {
   @State() clientState: ClientStatus;
 
-  private readonly clientStateStore = InjectorFactory.get().inject(UserStore);
+  private readonly clientStore = InjectorFactory.get().inject(UserStore);
   private readonly controllerMediator = InjectorFactory.get().inject(ClientStatusMediatorService);
 
   constructor() {
     this.controllerMediator.init();
 
-    this.clientStateStore.status$().subscribe(state => {
-      this.clientState = state;
-    });
+    this.clientStore.status$()
+      .pipe(throttleTime(1))
+      .subscribe(state => {
+        console.log('AppRoot', state);
+        this.clientState = state;
+      });
   }
 
   @Logger()
