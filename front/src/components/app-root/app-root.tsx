@@ -56,6 +56,7 @@ export class AppRoot implements ComponentInterface {
       case ClientStatus.Init: return this.renderSuspendView();
       case ClientStatus.Switching: return this.renderSuspendView();
       case ClientStatus.Signing: return this.renderLoginView();
+      case ClientStatus.Watching: return this.renderWatchingView();
       default: return this.renderErrorView();
     }
   }
@@ -87,5 +88,12 @@ export class AppRoot implements ComponentInterface {
         </p>
       </div>
     )
+  }
+
+  @Logger()
+  private renderWatchingView(): string {
+    return (
+      <watching-view id={getViewIdByClientState(this.clientState)}></watching-view>
+    );
   }
 }
