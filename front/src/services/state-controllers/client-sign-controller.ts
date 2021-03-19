@@ -48,7 +48,8 @@ export class ClientSignController implements ClientStatusController {
     this.userNotificationsService.pushNotification({
       message: `There ${dto.numUsers} user${dto.numUsers === 1 ? '' : 's'} now`,
     });
-    this.clientStore.setClientMode(ClientMode.WatchingMode);
+    this.clientStore.setUserId(dto.id);
+    this.clientStore.setClientMode(ClientMode.PlayingMode);
     this.clientStore.switchStatus(ClientStatus.Switching);
   }
 }

@@ -7,6 +7,7 @@ import { InjectorService } from './Injector-factory';
 import { Logger } from './logger/logger';
 
 export interface UserState {
+  userId: string;
   userName: string;
   mode: ClientMode;
   status: ClientStatus;
@@ -15,6 +16,7 @@ export interface UserState {
 
 export class UserStore {
   private state = new BehaviorSubject<UserState>({
+    userId: '',
     userName: `test-${Math.floor(Math.random()*1000)}`,
     mode: ClientMode.None,
     status: ClientStatus.Init,
@@ -31,6 +33,10 @@ export class UserStore {
 
   public setUserName(userName: string): void {
     this.patchState({ userName });
+  }
+
+  public setUserId(userId: string) {
+    this.patchState({ userId });
   }
 
   public switchStatus(status: ClientStatus): void {

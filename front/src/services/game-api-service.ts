@@ -60,9 +60,19 @@ export class GameApiService {
   }
 
   @Logger()
+  public stopWatching(): void {
+    this.socket.emit(SocketEvent.StopWatchingMode);
+  }
+
+  @Logger()
   public startPlaying(): void {
     this.socket.emit(SocketEvent.StartPlayingMode);
     this.socket.emit(SocketEvent.StartNewGame);
+  }
+
+  @Logger()
+  public stopPlaying(): void {
+    this.socket.emit(SocketEvent.StopPlayingMode);
   }
 
   @Logger()

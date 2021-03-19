@@ -10,7 +10,7 @@ export const logMessage = function(isStart: boolean, targetInstance, functionNam
   const className = getClassName(targetInstance);
   const classNameStr = className ? `${className}::` : '';
 
-  const logFunction = options.logFunction || console.info;
+  const printLn = options.logFunction || console.info;
 
   const args = options.withArgs ? getArgsStrings(functionArgsVals, originalFunction, options) : null;
   const props = options.withClassProperties ? getPropertiesStrings(options.withClassProperties, targetInstance) : null;
@@ -21,8 +21,8 @@ export const logMessage = function(isStart: boolean, targetInstance, functionNam
   }
 
   const startEndStr = isStart ? 'start' : 'end';
-  logFunction(`${time}${classNameStr}${functionName}\t${startEndStr}`);
+  printLn(`${time}${classNameStr}${functionName}\t${startEndStr}`);
 
-  args && args.length !== 0 && logFunction(`\tFunction arguments:\n\t\t${args.join('\n\t\t')}`);
-  props && props.length !== 0 && logFunction(`\tClass properties:\n\t\t${props.join('\n\t\t')}`);
+  args && args.length !== 0 && printLn(`\t${args.join('\n\t\t')}`);
+  props && props.length !== 0 && printLn(`\tClass properties:\n\t\t${props.join('\n\t\t')}`);
 };
