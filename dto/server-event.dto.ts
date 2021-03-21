@@ -1,4 +1,4 @@
 export interface ServerEventDto {
   id: string;
-  name: string;
+  username: string;
 }

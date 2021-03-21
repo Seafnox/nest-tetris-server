@@ -2,10 +2,12 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server } from 'socket.io';
 import { BaseServerEventDto } from '~tetris/dto/base-server-event-dto';
 import { RegisterUserEventDto } from '~tetris/dto/register-user-event-dto';
+import { ServerEventDto } from '~tetris/dto/server-event.dto';
 import { SocketEvent } from '~tetris/dto/socket-event';
 import { RecordLike } from '../../interfaces/record-like';
 import { GameService } from '../../services/game.service';
 import { XSocketClient } from '../../interfaces/x-socket-client';
+import { DtoPreset } from './dto-preset';
 
 @WebSocketGateway({
   cors: {
@@ -122,19 +124,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.server.sockets.sockets.size;
   }
 
-  private broadcastFromPlayer<Dto extends RecordLike>(player: XSocketClient, eventName: string, data: Omit<Dto, 'id'|'name'>): void {
+  private broadcastFromPlayer<Dto extends ServerEventDto>(player: XSocketClient, eventName: string, data: DtoPreset<Dto>): void {
     this.broadcast(eventName, {
       id: player.id,
-      name: player.name,
+      username: player.name,
       ...data,
     })
   }
 
-  private broadcast<Dto extends RecordLike>(eventName: string, data: Dto): void {
+  private broadcast<Dto extends ServerEventDto>(eventName: string, data: Dto): void {
     this.server.emit(eventName, data);
   }
 
-  private emit<Dto extends RecordLike>(playerId: string, eventName: string, data?: Omit<Dto, 'id'|'name'>): void {
+  private emit<Dto extends ServerEventDto>(playerId: string, eventName: string, data?: DtoPreset<Dto>): void {
     const targetIds = [playerId, ...this.watchers];
     const player: XSocketClient = this.server.sockets.sockets.get(playerId);
 
@@ -145,7 +147,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     })
   }
 
-  private emitToWatcher<Dto extends RecordLike>(watcher: XSocketClient, player: XSocketClient, eventName: string, data: Omit<Dto, 'id'|'name'>): void {
+  private emitToWatcher<Dto extends ServerEventDto>(watcher: XSocketClient, player: XSocketClient, eventName: string, data: DtoPreset<Dto>): void {
     watcher.emit( eventName, {
       id: player.id,
       username: player.name,

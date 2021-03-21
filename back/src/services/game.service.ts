@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { DirectionDto } from '~tetris/dto/direction-dto';
+import { GameStateEventDto } from '~tetris/dto/game-state-event.dto';
+import { LevelEventDto } from '~tetris/dto/level-event.dto';
+import { NextItemEventDto } from '~tetris/dto/next-item-event.dto';
+import { ScoreEventDto } from '~tetris/dto/score-event.dto';
+import { ServerEventDto } from '~tetris/dto/server-event.dto';
 import { Direction } from '../game/direction';
 import { Game } from '../game/game';
+import { DtoPreset } from '../gateways/game/dto-preset';
 import { GameBridgeEvent } from '../interfaces/game-bridge-event';
 import { RecordLike } from '../interfaces/record-like';
 
@@ -56,21 +62,21 @@ export class GameService {
         const game = this.getGame(playerId);
         game.onMove(this.getDirection(data.payload));
 
-        this.emit(playerId, 'newGameState', { state: game.getStateView() });
+      this.emitGameState(playerId, game);
     }
 
     private onRotateFigure(playerId: string, data: { payload: string}): void {
         const game = this.getGame(playerId);
         game.onRotate(this.getDirection(data.payload));
 
-        this.emit(playerId, 'newGameState', { state: game.getStateView() });
+      this.emitGameState(playerId, game);
     }
 
     private onDropFigure(playerId: string): void {
         const game = this.getGame(playerId);
         game.onDrop();
 
-        this.emit(playerId, 'newGameState', { state: game.getStateView() });
+        this.emitGameState(playerId, game);
     }
 
     private getDirection(directionStr: string): Direction {
@@ -113,24 +119,24 @@ export class GameService {
         }
     }
 
-    private emit(playerId: string, eventName: string, data: RecordLike): void {
+    private emit<Dto extends ServerEventDto>(playerId: string, eventName: string, data: DtoPreset<Dto>): void {
         this.emitter$.next({ playerId, eventName, data });
     }
 
     private emitGameState(playerId: string, game: Game): void {
-        this.emit(playerId, 'newGameState', { state: game.getStateView() });
+        this.emit<GameStateEventDto>(playerId, 'newGameState', { state: game.getStateView() });
     }
 
     private emitScore(playerId: string, game: Game): void {
-        this.emit(playerId, 'newScore', { value: game.score});
+        this.emit<ScoreEventDto>(playerId, 'newScore', { value: game.score});
     }
 
     private emitLvl(playerId: string, game: Game): void {
-        this.emit(playerId, 'newLvl', { value: game.level});
+        this.emit<LevelEventDto>(playerId, 'newLvl', { value: game.level});
     }
 
     private emitNextItem(playerId: string, game: Game): void {
-        this.emit(playerId, 'newNextItem', { item: game.nextFigure.getStateView() });
+        this.emit<NextItemEventDto>(playerId, 'newNextItem', { item: game.nextFigure.getStateView() });
     }
 
     private dropPreviousGame(token: string): void {
