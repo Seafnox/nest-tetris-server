@@ -3,7 +3,12 @@ import { take, filter } from 'rxjs/operators';
 import { BaseServerEventDto } from '~tetris/dto/base-server-event-dto';
 import { DirectionDto } from '~tetris/dto/direction-dto';
 import io from 'socket.io-client';
+import { GameStateEventDto } from '~tetris/dto/game-state-event.dto';
+import { LevelEventDto } from '~tetris/dto/level-event.dto';
+import { NextItemEventDto } from '~tetris/dto/next-item-event.dto';
 import { RegisterUserEventDto } from '~tetris/dto/register-user-event-dto';
+import { ScoreEventDto } from '~tetris/dto/score-event.dto';
+import { ServerEventDto } from '~tetris/dto/server-event.dto';
 import { SocketEvent } from '~tetris/dto/socket-event';
 import { Logger } from './logger/logger';
 
@@ -94,19 +99,19 @@ export class GameApiService {
     return this.actionToStream$(SocketEvent.UserLoginSuccess);
   }
 
-  public get onGameFieldUpdated$(): Observable<BaseServerEventDto> {
+  public get onGameFieldUpdated$(): Observable<GameStateEventDto> {
     return this.actionToStream$(SocketEvent.UpdateGameView);
   }
 
-  public get onNextItemUpdated$(): Observable<BaseServerEventDto> {
+  public get onNextItemUpdated$(): Observable<NextItemEventDto> {
     return this.actionToStream$(SocketEvent.UpdateNextFigure);
   }
 
-  public get onScoreUpdated$(): Observable<BaseServerEventDto> {
+  public get onScoreUpdated$(): Observable<ScoreEventDto> {
     return this.actionToStream$(SocketEvent.UpdateScore);
   }
 
-  public get onLevelUpdated$(): Observable<BaseServerEventDto> {
+  public get onLevelUpdated$(): Observable<LevelEventDto> {
     return this.actionToStream$(SocketEvent.UpdateLevel);
   }
 
@@ -118,27 +123,27 @@ export class GameApiService {
     return this.actionToStream$(SocketEvent.RemoveUser);
   }
 
-  public get onDisconnected$(): Observable<BaseServerEventDto> {
+  public get onDisconnected$(): Observable<ServerEventDto> {
     return this.actionToStream$(SocketEvent.Disconnect);
   }
 
-  public get onConnected$(): Observable<BaseServerEventDto> {
+  public get onConnected$(): Observable<ServerEventDto> {
     return this.actionToStream$(SocketEvent.ConnectSuccess);
   }
 
-  public get onConnectFailed$(): Observable<BaseServerEventDto> {
+  public get onConnectFailed$(): Observable<ServerEventDto> {
     return this.actionToStream$(SocketEvent.ConnectFailed);
   }
 
-  public get onReconnectSuccess$(): Observable<BaseServerEventDto> {
+  public get onReconnectSuccess$(): Observable<ServerEventDto> {
     return this.actionToStream$(SocketEvent.ReconnectSuccess);
   }
 
-  public get onReconnectFail$(): Observable<BaseServerEventDto> {
+  public get onReconnectFail$(): Observable<ServerEventDto> {
     return this.actionToStream$(SocketEvent.ReconnectError);
   }
 
-  public get onReconnectFailed$(): Observable<BaseServerEventDto> {
+  public get onReconnectFailed$(): Observable<ServerEventDto> {
     return this.actionToStream$(SocketEvent.ReconnectFailed);
   }
 

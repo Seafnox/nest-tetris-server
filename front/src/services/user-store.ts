@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, distinctUntilChanged, delay } from 'rxjs/operators';
+import { GameStateDto } from '~tetris/dto/game-state-dto';
 import { ClientMode } from '../enums/client-mode';
 import { ClientStatus } from '../enums/client-status';
 import { ClientStatusGuard } from './client-status-guard';
@@ -12,6 +13,14 @@ export interface UserState {
   mode: ClientMode;
   status: ClientStatus;
   isLogin: boolean;
+  games: Record<string, Partial<UserGame>>;
+}
+
+export interface UserGame {
+  gameField: GameStateDto,
+  nextItem: GameStateDto,
+  level: number,
+  score: number,
 }
 
 export class UserStore {
@@ -21,6 +30,7 @@ export class UserStore {
     mode: ClientMode.None,
     status: ClientStatus.Init,
     isLogin: false,
+    games: {},
   });
 
   private readonly statusGuard = this.injector.inject(ClientStatusGuard);
@@ -45,6 +55,22 @@ export class UserStore {
     if (this.statusGuard.isAvailableStatus(status, state.status)) {
       this.patchState({ status });
     }
+  }
+
+  public setGameField(username: string, gameField: GameStateDto): void {
+    this.patchGames(username, { gameField });
+  }
+
+  public setNextItem(username: string, nextItem: GameStateDto) {
+    this.patchGames(username, { nextItem });
+  }
+
+  public setLevel(username: string, level: number) {
+    this.patchGames(username, { level });
+  }
+
+  public setScore(username: string, score: number) {
+    this.patchGames(username, { score });
   }
 
   public snapshot(): UserState {
@@ -78,6 +104,22 @@ export class UserStore {
 
   private getState(): UserState {
     return this.state.value;
+  }
+
+  @Logger()
+  private patchGames(username: string, gameState: Partial<UserGame>): void {
+    const { games } = this.getState();
+    const game = games[username];
+
+    this.patchState({
+      games: {
+        ...games,
+        [username]: {
+          ...game,
+          ...gameState,
+        },
+      }
+    })
   }
 
   @Logger()
