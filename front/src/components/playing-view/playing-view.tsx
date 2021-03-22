@@ -1,6 +1,7 @@
 import { Component, Host, h, State } from '@stencil/core';
-import { CellDto } from '~tetris/dto/cell-dto';
-import { GameStateDto } from '~tetris/dto/game-state-dto';
+import { switchMap } from 'rxjs/operators';
+import { InjectorFactory } from '../../services/Injector-factory';
+import { UserGame, UserStore } from '../../services/user-store';
 
 @Component({
   tag: 'playing-view',
@@ -8,41 +9,28 @@ import { GameStateDto } from '~tetris/dto/game-state-dto';
   shadow: true,
 })
 export class PlayingView {
-  @State() score: number = 0;
-  @State() level: number = 0;
-  @State() nextItem: GameStateDto = [[]];
-  @State() game: GameStateDto = [[]];
+  @State() game: Partial<UserGame> = {};
+  private readonly clientStore = InjectorFactory.get().inject(UserStore);
 
-  private timer: NodeJS.Timer;
-
-  checkNewState(): void {
-    clearTimeout(this.timer);
-    this.timer = setTimeout(() => {
-      this.score = Math.floor(Math.random()*10000);
-      this.level = Math.floor(Math.random()*100);
-      this.nextItem = this.generateState(4,4);
-      this.game = this.generateState(20,10);
-    }, 500);
+  constructor() {
+    this.clientStore.userName$()
+      .pipe(
+        switchMap(userName => this.clientStore.game$(userName)),
+      )
+      .subscribe(game => this.game = game)
   }
 
-  generateState(x: number, y: number): GameStateDto {
-    const randomic = `${Math.random().toString().substr(2)}${Math.random().toString().substr(2)}`;
-    const randomicLength = randomic.length;
-
-    return Array(x).fill(null).map((_, indexX) => {
-      return Array(y).fill(null).map((_, indexY) =>
-        (+randomic[(indexX * indexY) % randomicLength]) >= 5 ? CellDto.FILLED : CellDto.EMPTY)
-    });
-  }
-
-  render(): string {
-    this.checkNewState();
-
+  public render(): string {
     return (
       <Host>
-        <game-wrapper score={this.score} level={this.level} nextItem={this.nextItem} state={this.game}></game-wrapper>
+        {this.game ? this.renderGame(this.game) : 'NONE'}
       </Host>
     );
   }
 
+  private renderGame(game: Partial<UserGame>): string {
+    return (
+      <game-wrapper score={game.score} level={game.level} nextItem={game.nextItem} state={game.gameField}></game-wrapper>
+    )
+  }
 }

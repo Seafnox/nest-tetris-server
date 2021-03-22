@@ -30,8 +30,6 @@ export namespace Components {
     }
     interface SuspendView {
     }
-    interface WatchingItem {
-    }
     interface WatchingView {
     }
 }
@@ -84,12 +82,6 @@ declare global {
         prototype: HTMLSuspendViewElement;
         new (): HTMLSuspendViewElement;
     };
-    interface HTMLWatchingItemElement extends Components.WatchingItem, HTMLStencilElement {
-    }
-    var HTMLWatchingItemElement: {
-        prototype: HTMLWatchingItemElement;
-        new (): HTMLWatchingItemElement;
-    };
     interface HTMLWatchingViewElement extends Components.WatchingView, HTMLStencilElement {
     }
     var HTMLWatchingViewElement: {
@@ -105,7 +97,6 @@ declare global {
         "login-view": HTMLLoginViewElement;
         "playing-view": HTMLPlayingViewElement;
         "suspend-view": HTMLSuspendViewElement;
-        "watching-item": HTMLWatchingItemElement;
         "watching-view": HTMLWatchingViewElement;
     }
 }
@@ -133,8 +124,6 @@ declare namespace LocalJSX {
     }
     interface SuspendView {
     }
-    interface WatchingItem {
-    }
     interface WatchingView {
     }
     interface IntrinsicElements {
@@ -146,7 +135,6 @@ declare namespace LocalJSX {
         "login-view": LoginView;
         "playing-view": PlayingView;
         "suspend-view": SuspendView;
-        "watching-item": WatchingItem;
         "watching-view": WatchingView;
     }
 }
@@ -162,7 +150,6 @@ declare module "@stencil/core" {
             "login-view": LocalJSX.LoginView & JSXBase.HTMLAttributes<HTMLLoginViewElement>;
             "playing-view": LocalJSX.PlayingView & JSXBase.HTMLAttributes<HTMLPlayingViewElement>;
             "suspend-view": LocalJSX.SuspendView & JSXBase.HTMLAttributes<HTMLSuspendViewElement>;
-            "watching-item": LocalJSX.WatchingItem & JSXBase.HTMLAttributes<HTMLWatchingItemElement>;
             "watching-view": LocalJSX.WatchingView & JSXBase.HTMLAttributes<HTMLWatchingViewElement>;
         }
     }

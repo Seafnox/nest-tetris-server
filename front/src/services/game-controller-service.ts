@@ -38,6 +38,7 @@ export class GameControllerService {
   }
 
   public stop(): void {
+    this.userStore.clearGames();
     this.onStop$.next();
   }
 }

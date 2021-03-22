@@ -57,6 +57,10 @@ export class UserStore {
     }
   }
 
+  public clearGames(): void {
+    this.patchState({ games: {} });
+  }
+
   public setGameField(username: string, gameField: GameStateDto): void {
     this.patchGames(username, { gameField });
   }
@@ -102,6 +106,27 @@ export class UserStore {
     );
   }
 
+  public watchingUsers$(): Observable<string[]> {
+    return this.state$().pipe(
+      map(state => Object.keys(state.games)),
+      distinctUntilChanged(),
+    );
+  }
+
+  public game$(username: string): Observable<Partial<UserGame>> {
+    return this.state$().pipe(
+      map(state => state.games[username] ?? {}),
+      distinctUntilChanged(),
+    )
+  }
+
+  public games$(): Observable<Record<string, Partial<UserGame>>> {
+    return this.state$().pipe(
+      map(state => state.games),
+      distinctUntilChanged(),
+    )
+  }
+
   private getState(): UserState {
     return this.state.value;
   }
@@ -109,7 +134,7 @@ export class UserStore {
   @Logger()
   private patchGames(username: string, gameState: Partial<UserGame>): void {
     const { games } = this.getState();
-    const game = games[username];
+    const game = games[username] ?? {};
 
     this.patchState({
       games: {
