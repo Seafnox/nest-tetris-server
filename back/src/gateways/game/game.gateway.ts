@@ -121,7 +121,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private getConnectedClientCount(): number {
-    return this.server.sockets.sockets.size;
+    return Object.keys(this.server.sockets.sockets).length;
   }
 
   private broadcastFromPlayer<Dto extends ServerEventDto>(player: XSocketClient, eventName: string, data: DtoPreset<Dto>): void {
@@ -138,10 +138,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private emit<Dto extends ServerEventDto>(playerId: string, eventName: string, data?: DtoPreset<Dto>): void {
     const targetIds = [playerId, ...this.watchers];
-    const player: XSocketClient = this.server.sockets.sockets.get(playerId);
+    const player: XSocketClient = this.server.sockets.sockets[playerId];
 
     targetIds.forEach(targetId => {
-      const watcher: XSocketClient = this.server.sockets.sockets.get(targetId);
+      const watcher: XSocketClient = this.server.sockets.sockets[targetId];
 
       this.emitToWatcher(watcher, player, eventName, data);
     })
