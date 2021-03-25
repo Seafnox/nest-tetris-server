@@ -6,6 +6,7 @@ import { LevelEventDto } from '~tetris/dto/level-event.dto';
 import { NextItemEventDto } from '~tetris/dto/next-item-event.dto';
 import { ScoreEventDto } from '~tetris/dto/score-event.dto';
 import { ServerEventDto } from '~tetris/dto/server-event.dto';
+import { SocketEvent } from '~tetris/dto/socket-event';
 import { Direction } from '../game/direction';
 import { Game } from '../game/game';
 import { DtoPreset } from '../gateways/game/dto-preset';
@@ -25,10 +26,10 @@ export class GameService {
     }
 
     public userAction(event: GameBridgeEvent): void {
-        const userActionMap: Record<string, (playerId: string, data: RecordLike) => void> = {
-            moveFigure: this.onMoveFigure.bind(this),
-            rotateFigure: this.onRotateFigure.bind(this),
-            dropFigure: this.onDropFigure.bind(this),
+        const userActionMap: Partial<Record<SocketEvent, (playerId: string, data: RecordLike) => void>> = {
+            [SocketEvent.MoveFigure]: this.onMoveFigure.bind(this),
+            [SocketEvent.RotateFigure]: this.onRotateFigure.bind(this),
+            [SocketEvent.DropFigure]: this.onDropFigure.bind(this),
         }
 
         const handler = userActionMap[event.eventName];
@@ -58,14 +59,14 @@ export class GameService {
         this.dropPreviousGame(playerId);
     }
 
-    private onMoveFigure(playerId: string, data: { payload: string}): void {
+    private onMoveFigure(playerId: string, data: { payload: string }): void {
         const game = this.getGame(playerId);
         game.onMove(this.getDirection(data.payload));
 
       this.emitGameState(playerId, game);
     }
 
-    private onRotateFigure(playerId: string, data: { payload: string}): void {
+    private onRotateFigure(playerId: string, data: { payload: string }): void {
         const game = this.getGame(playerId);
         game.onRotate(this.getDirection(data.payload));
 
@@ -119,24 +120,24 @@ export class GameService {
         }
     }
 
-    private emit<Dto extends ServerEventDto>(playerId: string, eventName: string, data: DtoPreset<Dto>): void {
+    private emit<Dto extends ServerEventDto>(playerId: string, eventName: SocketEvent, data: DtoPreset<Dto>): void {
         this.emitter$.next({ playerId, eventName, data });
     }
 
     private emitGameState(playerId: string, game: Game): void {
-        this.emit<GameStateEventDto>(playerId, 'newGameState', { state: game.getStateView() });
+        this.emit<GameStateEventDto>(playerId, SocketEvent.UpdateGameView, { state: game.getStateView() });
     }
 
     private emitScore(playerId: string, game: Game): void {
-        this.emit<ScoreEventDto>(playerId, 'newScore', { value: game.score});
+        this.emit<ScoreEventDto>(playerId, SocketEvent.UpdateScore, { value: game.score});
     }
 
     private emitLvl(playerId: string, game: Game): void {
-        this.emit<LevelEventDto>(playerId, 'newLvl', { value: game.level});
+        this.emit<LevelEventDto>(playerId, SocketEvent.UpdateLevel, { value: game.level});
     }
 
     private emitNextItem(playerId: string, game: Game): void {
-        this.emit<NextItemEventDto>(playerId, 'newNextItem', { item: game.nextFigure.getStateView() });
+        this.emit<NextItemEventDto>(playerId, SocketEvent.UpdateNextFigure, { item: game.nextFigure.getStateView() });
     }
 
     private dropPreviousGame(token: string): void {

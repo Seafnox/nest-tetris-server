@@ -4,7 +4,6 @@ import { BaseServerEventDto } from '~tetris/dto/base-server-event-dto';
 import { RegisterUserEventDto } from '~tetris/dto/register-user-event-dto';
 import { ServerEventDto } from '~tetris/dto/server-event.dto';
 import { SocketEvent } from '~tetris/dto/socket-event';
-import { RecordLike } from '../../interfaces/record-like';
 import { GameService } from '../../services/game.service';
 import { XSocketClient } from '../../interfaces/x-socket-client';
 import { DtoPreset } from './dto-preset';
@@ -148,6 +147,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private emitToWatcher<Dto extends ServerEventDto>(watcher: XSocketClient, player: XSocketClient, eventName: string, data: DtoPreset<Dto>): void {
+    console.log('emit', eventName, player.id, player.name);
+
     watcher.emit( eventName, {
       id: player.id,
       username: player.name,
