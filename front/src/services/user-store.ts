@@ -5,7 +5,6 @@ import { ClientMode } from '../enums/client-mode';
 import { ClientStatus } from '../enums/client-status';
 import { ClientStatusGuard } from './client-status-guard';
 import { InjectorService } from './Injector-factory';
-import { Logger } from './logger/logger';
 
 export interface UserState {
   userId: string;
@@ -131,7 +130,6 @@ export class UserStore {
     return this.state.value;
   }
 
-  @Logger()
   private patchGames(username: string, gameState: Partial<UserGame>): void {
     const { games } = this.getState();
     const game = games[username] ?? {};
@@ -147,7 +145,6 @@ export class UserStore {
     })
   }
 
-  @Logger()
   private patchState(state: Partial<UserState>): void {
     const prevState = this.getState();
 
