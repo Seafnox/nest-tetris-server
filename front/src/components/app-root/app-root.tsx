@@ -16,10 +16,10 @@ export class AppRoot implements ComponentInterface {
   @State() clientState: ClientStatus;
 
   private readonly clientStore = InjectorFactory.get().inject(UserStore);
-  private readonly controllerMediator = InjectorFactory.get().inject(ClientStatusMediatorService);
+  private readonly clientStatusMediator = InjectorFactory.get().inject(ClientStatusMediatorService);
 
   constructor() {
-    this.controllerMediator.init();
+    this.clientStatusMediator.init();
 
     this.clientStore.status$()
       .pipe(throttleTime(1))
@@ -41,6 +41,7 @@ export class AppRoot implements ComponentInterface {
       <div class="app-wrapper">
         <header>
           Stencil App Starter ({this.clientState})
+          <mode-switcher></mode-switcher>
         </header>
 
         <main class="page-wrapper">

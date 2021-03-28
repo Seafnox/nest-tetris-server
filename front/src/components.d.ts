@@ -26,6 +26,8 @@ export namespace Components {
     }
     interface LoginView {
     }
+    interface ModeSwitcher {
+    }
     interface PlayingView {
     }
     interface SuspendView {
@@ -70,6 +72,12 @@ declare global {
         prototype: HTMLLoginViewElement;
         new (): HTMLLoginViewElement;
     };
+    interface HTMLModeSwitcherElement extends Components.ModeSwitcher, HTMLStencilElement {
+    }
+    var HTMLModeSwitcherElement: {
+        prototype: HTMLModeSwitcherElement;
+        new (): HTMLModeSwitcherElement;
+    };
     interface HTMLPlayingViewElement extends Components.PlayingView, HTMLStencilElement {
     }
     var HTMLPlayingViewElement: {
@@ -95,6 +103,7 @@ declare global {
         "game-score": HTMLGameScoreElement;
         "game-wrapper": HTMLGameWrapperElement;
         "login-view": HTMLLoginViewElement;
+        "mode-switcher": HTMLModeSwitcherElement;
         "playing-view": HTMLPlayingViewElement;
         "suspend-view": HTMLSuspendViewElement;
         "watching-view": HTMLWatchingViewElement;
@@ -120,6 +129,8 @@ declare namespace LocalJSX {
     }
     interface LoginView {
     }
+    interface ModeSwitcher {
+    }
     interface PlayingView {
     }
     interface SuspendView {
@@ -133,6 +144,7 @@ declare namespace LocalJSX {
         "game-score": GameScore;
         "game-wrapper": GameWrapper;
         "login-view": LoginView;
+        "mode-switcher": ModeSwitcher;
         "playing-view": PlayingView;
         "suspend-view": SuspendView;
         "watching-view": WatchingView;
@@ -148,6 +160,7 @@ declare module "@stencil/core" {
             "game-score": LocalJSX.GameScore & JSXBase.HTMLAttributes<HTMLGameScoreElement>;
             "game-wrapper": LocalJSX.GameWrapper & JSXBase.HTMLAttributes<HTMLGameWrapperElement>;
             "login-view": LocalJSX.LoginView & JSXBase.HTMLAttributes<HTMLLoginViewElement>;
+            "mode-switcher": LocalJSX.ModeSwitcher & JSXBase.HTMLAttributes<HTMLModeSwitcherElement>;
             "playing-view": LocalJSX.PlayingView & JSXBase.HTMLAttributes<HTMLPlayingViewElement>;
             "suspend-view": LocalJSX.SuspendView & JSXBase.HTMLAttributes<HTMLSuspendViewElement>;
             "watching-view": LocalJSX.WatchingView & JSXBase.HTMLAttributes<HTMLWatchingViewElement>;
