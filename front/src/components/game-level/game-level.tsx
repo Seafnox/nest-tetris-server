@@ -1,4 +1,5 @@
-import { Component, Prop } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
+import { GameFieldSize } from '../game-wrapper/game-field-size';
 
 @Component({
   tag: 'game-level',
@@ -7,9 +8,14 @@ import { Component, Prop } from '@stencil/core';
 })
 export class GameLevel {
   @Prop() level: number;
+  @Prop() size: GameFieldSize = GameFieldSize.Large;
 
   render(): string {
-    return `${this.level}`;
+    return (
+      <span class={this.size === GameFieldSize.Small ? 'level small' : 'level'}>
+        LVL: {this.level ?? '?'}
+      </span>
+    );
   }
 
 }

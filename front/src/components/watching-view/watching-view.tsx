@@ -1,6 +1,7 @@
 import { Component, h, State, Host } from '@stencil/core';
 import { InjectorFactory } from '../../services/Injector-factory';
 import { UserGame, UserStore } from '../../services/user-store';
+import { GameFieldSize } from '../game-wrapper/game-field-size';
 
 @Component({
   tag: 'watching-view',
@@ -20,22 +21,16 @@ export class WatchingView {
   public render(): string {
     return (
       <Host>
-        {this.renderGames()}
-      </Host>
-    );
-  }
-
-  private renderGames(): string {
-    return (
-      <Host>
-        {this.usernames.map(username => this.games[username]).map(this.renderGame)}
+        <div class="games">
+          {this.usernames.map(username => this.games[username]).filter(Boolean).map(this.renderGame.bind(this))}
+        </div>
       </Host>
     );
   }
 
   private renderGame(game: Partial<UserGame>): string {
     return (
-      <game-wrapper score={game.score} level={game.level} nextItem={game.nextItem} state={game.gameField}></game-wrapper>
+      <game-wrapper score={game.score} level={game.level} nextItem={game.nextItem} state={game.gameField} size={GameFieldSize.Small}></game-wrapper>
     )
   }
 }

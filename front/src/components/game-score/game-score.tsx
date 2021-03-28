@@ -1,4 +1,5 @@
-import { Component, Prop } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
+import { GameFieldSize } from '../game-wrapper/game-field-size';
 
 @Component({
   tag: 'game-score',
@@ -7,9 +8,14 @@ import { Component, Prop } from '@stencil/core';
 })
 export class GameScore {
   @Prop() score: number;
+  @Prop() size: GameFieldSize = GameFieldSize.Large;
 
   render(): string {
-    return `${this.score}`;
+    return (
+      <span class={this.size === GameFieldSize.Small ? 'score small' : 'score'}>
+        SCR: {this.score ?? '?'}
+      </span>
+    );
   }
 
 }

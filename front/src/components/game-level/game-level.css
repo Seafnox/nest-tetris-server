@@ -1,4 +1,11 @@
 :host {
   display: block;
+}
+
+.level {
   font-size: 3em;
+}
+
+.level.small {
+  font-size: 1em;
 }

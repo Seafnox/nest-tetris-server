@@ -1,4 +1,11 @@
 :host {
   display: block;
+}
+
+.score {
   font-size: 5em;
+}
+
+.score.small {
+  font-size: 2em;
 }

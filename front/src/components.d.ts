@@ -6,22 +6,28 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { GameStateDto } from "~tetris/dto/game-state-dto";
+import { GameFieldSize } from "./components/game-wrapper/game-field-size";
 export namespace Components {
     interface AppRoot {
     }
     interface GameField {
+        "size": GameFieldSize;
         "state": GameStateDto;
+        "useBgCells": boolean;
     }
     interface GameLevel {
         "level": number;
+        "size": GameFieldSize;
     }
     interface GameScore {
         "score": number;
+        "size": GameFieldSize;
     }
     interface GameWrapper {
         "level": number;
         "nextItem": GameStateDto;
         "score": number;
+        "size": GameFieldSize;
         "state": GameStateDto;
     }
     interface LoginView {
@@ -113,18 +119,23 @@ declare namespace LocalJSX {
     interface AppRoot {
     }
     interface GameField {
+        "size"?: GameFieldSize;
         "state"?: GameStateDto;
+        "useBgCells"?: boolean;
     }
     interface GameLevel {
         "level"?: number;
+        "size"?: GameFieldSize;
     }
     interface GameScore {
         "score"?: number;
+        "size"?: GameFieldSize;
     }
     interface GameWrapper {
         "level"?: number;
         "nextItem"?: GameStateDto;
         "score"?: number;
+        "size"?: GameFieldSize;
         "state"?: GameStateDto;
     }
     interface LoginView {
