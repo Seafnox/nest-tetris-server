@@ -137,17 +137,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private emit<Dto extends ServerEventDto>(playerId: string, eventName: string, data?: DtoPreset<Dto>): void {
     const targetIds = [playerId, ...this.watchers];
-    const player: XSocketClient = this.server.sockets.sockets[playerId];
+    const player: XSocketClient = this.server.sockets.sockets.get(playerId);
+
+    if (!player) {
+      console.error(`Can't find player with id: ${playerId}`);
+      console.warn(`\t knownIds: [${this.watchers.join(', ')}]`);
+
+      const socketIds = [];
+      this.server.sockets.sockets.forEach((value, key) => socketIds.push(key));
+      console.warn(`\t sockets: [${socketIds.join(', ')}]`);
+    }
 
     targetIds.forEach(targetId => {
-      const watcher: XSocketClient = this.server.sockets.sockets[targetId];
+      const watcher: XSocketClient = this.server.sockets.sockets.get(targetId);
 
       this.emitToWatcher(watcher, player, eventName, data);
     })
   }
 
   private emitToWatcher<Dto extends ServerEventDto>(watcher: XSocketClient, player: XSocketClient, eventName: string, data: DtoPreset<Dto>): void {
-    console.log('emit', eventName, player.id, player.name);
+    try {
+      console.log('emit', eventName, player.id, player.name);
+    } catch (error) {
+      console.log('emit', eventName);
+      console.log('\t', JSON.stringify(data));
+      console.log('\t', player.id);
+      console.log('\t', player.name);
+    }
 
     watcher.emit( eventName, {
       id: player.id,
