@@ -2,7 +2,7 @@ import { BehaviorSubject, Observable, fromEventPattern } from 'rxjs';
 import { take, filter } from 'rxjs/operators';
 import { BaseServerEventDto } from '~tetris/dto/base-server-event-dto';
 import { DirectionDto } from '~tetris/dto/direction-dto';
-import io from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import { GameStateEventDto } from '~tetris/dto/game-state-event.dto';
 import { LevelEventDto } from '~tetris/dto/level-event.dto';
 import { NextItemEventDto } from '~tetris/dto/next-item-event.dto';
@@ -13,7 +13,7 @@ import { SocketEvent } from '~tetris/dto/socket-event';
 import { Logger } from './logger/logger';
 
 export class GameApiService {
-  private readonly socket: SocketIOClient.Socket = io("http://127.0.0.1:3000/", {
+  private readonly socket: Socket = io("http://127.0.0.1:3000/", {
     upgrade: true,
     transports: ['websocket'],
   });
@@ -148,8 +148,8 @@ export class GameApiService {
   }
 
   private actionToStream$<T>(event: SocketEvent): Observable<T> {
-    const addCbHandler = this.socket.addEventListener.bind(this.socket, event);
-    const removeCbHandler = this.socket.removeEventListener.bind(this.socket, event);
+    const addCbHandler = this.socket.on.bind(this.socket, event);
+    const removeCbHandler = this.socket.off.bind(this.socket, event);
     return fromEventPattern(addCbHandler, removeCbHandler);
   }
 }
