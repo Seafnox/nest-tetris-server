@@ -14,6 +14,7 @@ export const config: Config = {
     browser: true,
   },
   devServer: {
+    address: '127.0.0.1',
     https: getCerts(),
     port: 4000
   },

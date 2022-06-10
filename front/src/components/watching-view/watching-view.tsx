@@ -22,15 +22,24 @@ export class WatchingView {
     return (
       <Host>
         <div class="games">
-          {this.usernames.map(username => this.games[username]).filter(Boolean).map(this.renderGame.bind(this))}
+          {this.usernames.map(this.renderGame.bind(this))}
         </div>
       </Host>
     );
   }
 
-  private renderGame(game: Partial<UserGame>): string {
+  private renderGame(username: string): string {
+    const game = this.games[username];
+
+    if (!game) {
+      return '';
+    }
+
     return (
-      <game-wrapper score={game.score} level={game.level} nextItem={game.nextItem} state={game.gameField} size={GameFieldSize.Small}></game-wrapper>
+      <div class="game">
+        {username}
+        <game-wrapper score={game.score} level={game.level} nextItem={game.nextItem} state={game.gameField} size={GameFieldSize.Small}></game-wrapper>
+      </div>
     )
   }
 }

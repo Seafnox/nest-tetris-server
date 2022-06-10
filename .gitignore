@@ -68,3 +68,4 @@ dist
 .idea
 
 */**/*.pem
+/static/build/
